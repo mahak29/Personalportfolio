@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { Menu, X } from "lucide-react";
 
 const NAV = [
   { label: "About",      href: "#about" },
@@ -22,14 +23,14 @@ export function Navigation() {
     <motion.nav
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 1.8, duration: 0.7 }}
+      transition={{ delay: 0.15, duration: 0.45 }}
       style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 999,
         padding: "1.1rem clamp(1.5rem, 8vw, 8rem)",
         display: "flex", alignItems: "center", justifyContent: "space-between",
         background: scrolled ? "rgba(10,8,0,0.94)" : "transparent",
         borderBottom: scrolled ? "1px solid rgba(201,151,28,0.1)" : "1px solid transparent",
-        backdropFilter: scrolled ? "blur(24px)" : "none",
+        backdropFilter: scrolled || mobileOpen ? "blur(18px)" : "none",
         transition: "background 0.45s, border-color 0.45s",
       }}
     >
@@ -45,7 +46,7 @@ export function Navigation() {
       </a>
 
       {/* Desktop links */}
-      <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
+      <div className="desktop-nav" style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
         {NAV.map(item => (
           <a
             key={item.href}
@@ -82,6 +83,68 @@ export function Navigation() {
           Hire Me
         </a>
       </div>
+
+      <button
+        className="mobile-menu-button"
+        type="button"
+        aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
+        aria-expanded={mobileOpen}
+        onClick={() => setMobileOpen(open => !open)}
+        style={{
+          width: 42, height: 42, padding: 0, borderRadius: 4,
+          border: "1px solid rgba(201,151,28,0.25)",
+          background: "rgba(10,8,0,0.7)", color: "#C9971C",
+          alignItems: "center", justifyContent: "center",
+        }}
+      >
+        {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            className="mobile-menu"
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22 }}
+            style={{
+              position: "absolute", top: "100%", left: 0, right: 0,
+              padding: "0.75rem 1.5rem 1.25rem",
+              background: "rgba(10,8,0,0.98)",
+              borderBottom: "1px solid rgba(201,151,28,0.14)",
+            }}
+          >
+            {[...NAV, { label: "Skills", href: "#capabilities" }].map(item => (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  display: "block", padding: "0.9rem 0",
+                  borderBottom: "1px solid rgba(201,151,28,0.08)",
+                  color: "#F5F0E6", fontFamily: "Inter, sans-serif",
+                  fontSize: "0.95rem", textDecoration: "none",
+                }}
+              >
+                {item.label}
+              </a>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <style>{`
+        .mobile-menu-button, .mobile-menu { display: none; }
+        @media (max-width: 820px) {
+          .desktop-nav { display: none !important; }
+          .mobile-menu-button { display: flex !important; }
+          .mobile-menu { display: block !important; }
+        }
+        @media (max-width: 420px) {
+          nav > a span:last-child { display: none; }
+        }
+      `}</style>
     </motion.nav>
   );
 }

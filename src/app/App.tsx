@@ -15,20 +15,54 @@ export default function App() {
     document.documentElement.style.scrollBehavior = "smooth";
     document.body.style.background  = "#0A0800";
     document.body.style.overflowX   = "hidden";
-    document.body.style.cursor      = "none";
 
     const style = document.createElement("style");
     style.textContent = `
+      *, *::before, *::after { box-sizing: border-box; }
+      html { scroll-padding-top: 76px; }
+      body { margin: 0; }
       ::-webkit-scrollbar { display: none; }
       * { scrollbar-width: none; }
-      a, button { cursor: none !important; }
       h1, h2, h3 { margin: 0; }
+      img, svg, canvas { max-width: 100%; }
+      button, a { -webkit-tap-highlight-color: transparent; }
+
+      @media (hover: hover) and (pointer: fine) {
+        body, a, button, [data-cursor] { cursor: none !important; }
+      }
 
       @media (max-width: 768px) {
         .about-grid,
         .proj-grid,
         .cap-grid,
         .contact-grid { grid-template-columns: 1fr !important; }
+        .project-copy,
+        .project-metrics { order: initial !important; }
+        .stat-grid { grid-template-columns: 1fr 1fr !important; }
+        .skill-detail-grid { grid-template-columns: 1fr !important; }
+        .skill-detail-item {
+          border-right: none !important;
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+        }
+        .contact-footer { align-items: flex-start !important; flex-direction: column; }
+      }
+
+      @media (max-width: 480px) {
+        .stat-grid,
+        .project-metric-grid { grid-template-columns: 1fr !important; }
+        .skill-card-grid { grid-template-columns: 1fr 1fr !important; }
+        .experience-detail-grid { grid-template-columns: 1fr !important; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto !important; }
+        *, *::before, *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
       }
     `;
     document.head.appendChild(style);

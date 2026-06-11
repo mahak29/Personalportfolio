@@ -109,7 +109,7 @@ function ProjectCard({ project, idx }: { project:typeof projects[0]; idx:number 
         {/* Left */}
         <motion.div
           initial={{opacity:0,x:isEven?-48:48}} animate={inView?{opacity:1,x:0}:{}}
-          transition={{duration:0.85,ease:[0.16,1,0.3,1]}} style={{order:isEven?0:1}}>
+          transition={{duration:0.85,ease:[0.16,1,0.3,1]}} className="project-copy" style={{order:isEven?0:1}}>
 
           {/* Clip-path title reveal */}
           <div style={{overflow:"hidden",marginBottom:"0.5rem"}}>
@@ -148,8 +148,8 @@ function ProjectCard({ project, idx }: { project:typeof projects[0]; idx:number 
 
         {/* Right — tilt metric grid */}
         <motion.div initial={{opacity:0,x:isEven?48:-48}} animate={inView?{opacity:1,x:0}:{}}
-          transition={{duration:0.85,delay:0.1,ease:[0.16,1,0.3,1]}} style={{order:isEven?1:0}}>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1px",background:"rgba(201,151,28,0.1)",border:"1px solid rgba(201,151,28,0.1)"}}>
+          transition={{duration:0.85,delay:0.1,ease:[0.16,1,0.3,1]}} className="project-metrics" style={{order:isEven?1:0}}>
+          <div className="project-metric-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1px",background:"rgba(201,151,28,0.1)",border:"1px solid rgba(201,151,28,0.1)"}}>
             {project.numbers.map((n,ni) => (
               <TiltMetric key={ni} n={n} accent={project.accent} bg={ni%2===0?"#0A0800":"#0F0B00"} />
             ))}

@@ -133,7 +133,7 @@ export function ContactScene() {
       </div>
 
       {/* Footer */}
-      <motion.div initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ delay: 0.8 }}
+      <motion.div className="contact-footer" initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ delay: 0.8 }}
         style={{ padding: "2rem clamp(2rem,8vw,8rem)", borderTop: "1px solid rgba(201,151,28,0.07)", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", zIndex: 5, flexWrap: "wrap", gap: "0.75rem" }}>
         <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", color: "#7A6A45", opacity: 0.5, letterSpacing: "0.1em" }}>MAHAK BANSAL © 2022</span>
         <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", color: "#7A6A45", opacity: 0.5, letterSpacing: "0.1em" }}>FULL STACK ENGINEER · AHMEDABAD, INDIA</span>

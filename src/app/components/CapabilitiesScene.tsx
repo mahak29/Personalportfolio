@@ -167,13 +167,14 @@ export function CapabilitiesScene() {
                   {stacks[active].summary}
                 </p>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0" }}>
+                <div className="skill-detail-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0" }}>
                   {stacks[active].items.map((item, j) => (
                     <motion.div
                       key={item}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.35, delay: j * 0.05 }}
+                      className="skill-detail-item"
                       style={{
                         padding: "0.9rem 0",
                         borderBottom: "1px solid rgba(201,151,28,0.1)",

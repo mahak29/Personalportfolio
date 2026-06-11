@@ -20,7 +20,7 @@ export function MarqueeStrip() {
           <span key={i} style={{
             fontFamily: item === "·" ? "sans-serif" : "JetBrains Mono, monospace",
             fontSize: item === "·" ? "0.8rem" : "0.7rem",
-            color: item === "·" ? "rgba(201,151,28,0.4)" : "#7A6A45",
+            color: item === "·" ? "rgba(201,151,28,0.6)" : "#9A8758",
             letterSpacing: item === "·" ? 0 : "0.14em",
             textTransform: item === "·" ? "none" : "uppercase",
             flexShrink: 0,

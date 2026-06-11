@@ -132,7 +132,7 @@ export function AboutScene() {
             </p>
 
             {/* Curated skill chips */}
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(130px, 1fr))",gap:"0.65rem",maxWidth:520}}>
+            <div className="skill-card-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(130px, 1fr))",gap:"0.65rem",maxWidth:520}}>
               {skills.map((s, i) => (
                 <motion.a
                   key={s.name}
@@ -217,6 +217,7 @@ export function AboutScene() {
           <motion.div
             initial={{opacity:0,x:30}} animate={inView?{opacity:1,x:0}:{}}
             transition={{duration:0.8,delay:0.2,ease:[0.16,1,0.3,1]}}
+            className="stat-grid"
             style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1px",background:"rgba(201,151,28,0.1)",border:"1px solid rgba(201,151,28,0.1)"}}>
             {STATS.map((s,i) => <StatBox key={i} s={s} active={inView} i={i} />)}
           </motion.div>

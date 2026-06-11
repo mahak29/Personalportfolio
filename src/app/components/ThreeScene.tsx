@@ -11,13 +11,15 @@ export function ThreeScene({ scrollProgress = 0 }: { scrollProgress?: number }) 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
+    const shouldDisable = window.matchMedia("(max-width: 900px), (prefers-reduced-motion: reduce)").matches;
+    if (shouldDisable) return;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(48, mount.clientWidth / mount.clientHeight, 0.1, 100);
     camera.position.set(0, 0, 5.5);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.setClearColor(0x000000, 0);
     mount.appendChild(renderer.domElement);
@@ -39,7 +41,8 @@ export function ThreeScene({ scrollProgress = 0 }: { scrollProgress?: number }) 
 
     // Outer sphere shell
     const sphGeo = new THREE.SphereGeometry(2.1, 20, 14);
-    group.add(new THREE.Mesh(sphGeo, new THREE.MeshBasicMaterial({ color: 0xC9971C, wireframe: true, transparent: true, opacity: 0.04 })));
+    const sphMat = new THREE.MeshBasicMaterial({ color: 0xC9971C, wireframe: true, transparent: true, opacity: 0.04 });
+    group.add(new THREE.Mesh(sphGeo, sphMat));
 
     // Gold particles
     const N = 260;
@@ -78,10 +81,12 @@ export function ThreeScene({ scrollProgress = 0 }: { scrollProgress?: number }) 
     window.addEventListener("resize", onResize);
 
     let t = 0;
+    let visible = !document.hidden;
     const tgt = { x: 0, y: 0 };
 
     const animate = () => {
       rafRef.current = requestAnimationFrame(animate);
+      if (!visible) return;
       t += 0.004;
       tgt.x += (mouse.current.y * 0.3 - tgt.x) * 0.04;
       tgt.y += (mouse.current.x * 0.5 - tgt.y) * 0.04;
@@ -94,13 +99,26 @@ export function ThreeScene({ scrollProgress = 0 }: { scrollProgress?: number }) 
       particles.rotation.y = t * 0.045;
       renderer.render(scene, camera);
     };
+    const onVisibility = () => { visible = !document.hidden; };
+    document.addEventListener("visibilitychange", onVisibility);
     animate();
 
     return () => {
       cancelAnimationFrame(rafRef.current);
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("mousemove", onMM);
       window.removeEventListener("resize", onResize);
       renderer.dispose();
+      icoGeo.dispose();
+      icoMat.dispose();
+      octGeo.dispose();
+      (octMesh.material as THREE.Material).dispose();
+      sphGeo.dispose();
+      sphMat.dispose();
+      pgeo.dispose();
+      particles.material.dispose();
+      ringGeo.dispose();
+      (ringMesh.material as THREE.Material).dispose();
       if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
     };
   }, []);

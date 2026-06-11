@@ -170,7 +170,7 @@ function JobCard({ job, index }: { job: typeof jobs[0]; index: number }) {
             style={{ overflow: "hidden" }}
           >
             <div style={{ marginTop: "2.5rem", borderTop: "1px solid rgba(201,151,28,0.1)", paddingTop: "2rem" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.25rem", marginBottom: "2rem" }}>
+              <div className="experience-detail-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))", gap: "1.25rem", marginBottom: "2rem" }}>
                 {job.highlights.map((h, hi) => (
                   <div key={hi} style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
                     <div style={{ width: 5, height: 5, borderRadius: "50%", background: job.accent, flexShrink: 0, marginTop: 6 }} />
