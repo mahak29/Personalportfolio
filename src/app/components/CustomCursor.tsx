@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
-const TRAIL_COUNT = 5;
-
 export function CustomCursor() {
-  const dotRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-  const trailRefs = useRef<(HTMLDivElement | null)[]>(Array(TRAIL_COUNT).fill(null));
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const coreRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
@@ -19,53 +17,56 @@ export function CustomCursor() {
   useEffect(() => {
     if (!enabled) return;
 
-    const pos = { x: -200, y: -200 };
-    const ring = { x: -200, y: -200 };
-    const history = Array.from({ length: TRAIL_COUNT }, () => ({ x: -200, y: -200 }));
-    let hovered = false;
-    let clicked = false;
+    const target = { x: -100, y: -100 };
+    const current = { x: -100, y: -100 };
+    let interactive = false;
+    let pressed = false;
+    let visible = false;
     let raf = 0;
 
     const onMove = (event: PointerEvent) => {
-      pos.x = event.clientX;
-      pos.y = event.clientY;
+      target.x = event.clientX;
+      target.y = event.clientY;
+      visible = true;
     };
     const onOver = (event: PointerEvent) => {
-      hovered = Boolean((event.target as Element | null)?.closest("a, button, [data-cursor]"));
+      interactive = Boolean((event.target as Element | null)?.closest("a, button, [data-cursor]"));
     };
-    const onDown = () => { clicked = true; };
-    const onUp = () => { clicked = false; };
+    const onLeave = () => { visible = false; };
+    const onEnter = () => { visible = true; };
+    const onDown = () => { pressed = true; };
+    const onUp = () => { pressed = false; };
 
     const tick = () => {
-      ring.x += (pos.x - ring.x) * 0.18;
-      ring.y += (pos.y - ring.y) * 0.18;
+      current.x += (target.x - current.x) * 0.24;
+      current.y += (target.y - current.y) * 0.24;
 
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate3d(${pos.x - 4}px, ${pos.y - 4}px, 0) scale(${clicked ? 0.65 : 1})`;
-        dotRef.current.style.background = hovered ? "#F0C040" : "#F5F0E6";
+      if (cursorRef.current) {
+        const size = interactive ? 50 : 34;
+        const scale = pressed ? 0.82 : 1;
+        cursorRef.current.style.width = `${size}px`;
+        cursorRef.current.style.height = `${size}px`;
+        cursorRef.current.style.opacity = visible ? "1" : "0";
+        cursorRef.current.style.transform = `translate3d(${current.x - size / 2}px, ${current.y - size / 2}px, 0) scale(${scale})`;
+        cursorRef.current.style.setProperty("--cursor-color", interactive ? "#F0C040" : "#C9971C");
       }
-      if (ringRef.current) {
-        const size = hovered ? 46 : 34;
-        ringRef.current.style.width = `${size}px`;
-        ringRef.current.style.height = `${size}px`;
-        ringRef.current.style.borderColor = hovered ? "rgba(201,151,28,0.8)" : "rgba(245,240,230,0.22)";
-        ringRef.current.style.transform = `translate3d(${ring.x - size / 2}px, ${ring.y - size / 2}px, 0)`;
+      if (coreRef.current) {
+        coreRef.current.style.transform = `translate3d(${target.x - 2}px, ${target.y - 2}px, 0) scale(${pressed ? 1.7 : 1})`;
+        coreRef.current.style.opacity = visible ? "1" : "0";
+        coreRef.current.style.background = interactive ? "#F0C040" : "#F5F0E6";
       }
-
-      history.unshift({ ...pos });
-      history.pop();
-      trailRefs.current.forEach((element, index) => {
-        if (!element) return;
-        const point = history[index];
-        element.style.transform = `translate3d(${point.x - 2}px, ${point.y - 2}px, 0)`;
-        element.style.opacity = String((1 - index / TRAIL_COUNT) * (hovered ? 0.3 : 0.12));
-      });
+      if (labelRef.current) {
+        labelRef.current.style.opacity = interactive && visible ? "1" : "0";
+        labelRef.current.style.transform = interactive ? "translateY(0)" : "translateY(3px)";
+      }
 
       raf = requestAnimationFrame(tick);
     };
 
     window.addEventListener("pointermove", onMove, { passive: true });
     document.addEventListener("pointerover", onOver, { passive: true });
+    document.documentElement.addEventListener("mouseleave", onLeave);
+    document.documentElement.addEventListener("mouseenter", onEnter);
     window.addEventListener("pointerdown", onDown);
     window.addEventListener("pointerup", onUp);
     tick();
@@ -74,6 +75,8 @@ export function CustomCursor() {
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerover", onOver);
+      document.documentElement.removeEventListener("mouseleave", onLeave);
+      document.documentElement.removeEventListener("mouseenter", onEnter);
       window.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointerup", onUp);
     };
@@ -81,34 +84,50 @@ export function CustomCursor() {
 
   if (!enabled) return null;
 
+  const corner = {
+    position: "absolute" as const,
+    width: 8,
+    height: 8,
+    borderColor: "var(--cursor-color)",
+    transition: "border-color 0.2s",
+  };
+
   return (
     <>
-      {Array.from({ length: TRAIL_COUNT }).map((_, index) => (
-        <div
-          key={index}
-          ref={element => { trailRefs.current[index] = element; }}
-          style={{
-            position: "fixed", top: 0, left: 0, width: 4, height: 4,
-            borderRadius: "50%", background: "#C9971C", opacity: 0,
-            pointerEvents: "none", zIndex: 99996, willChange: "transform",
-          }}
-        />
-      ))}
       <div
-        ref={ringRef}
+        ref={cursorRef}
         style={{
+          "--cursor-color": "#C9971C",
           position: "fixed", top: 0, left: 0, width: 34, height: 34,
-          borderRadius: "50%", border: "1px solid rgba(245,240,230,0.22)",
-          pointerEvents: "none", zIndex: 99998, willChange: "transform",
-          transition: "width 0.2s, height 0.2s, border-color 0.2s",
-        }}
-      />
+          pointerEvents: "none", zIndex: 99998, opacity: 0,
+          willChange: "transform,width,height", transition: "width 0.2s,height 0.2s,opacity 0.18s",
+        } as React.CSSProperties}
+      >
+        <span style={{ ...corner, top: 0, left: 0, borderTop: "1px solid", borderLeft: "1px solid" }} />
+        <span style={{ ...corner, top: 0, right: 0, borderTop: "1px solid", borderRight: "1px solid" }} />
+        <span style={{ ...corner, bottom: 0, left: 0, borderBottom: "1px solid", borderLeft: "1px solid" }} />
+        <span style={{ ...corner, bottom: 0, right: 0, borderBottom: "1px solid", borderRight: "1px solid" }} />
+        <span
+          ref={labelRef}
+          style={{
+            position: "absolute", left: "50%", top: "calc(100% + 7px)",
+            transform: "translate(-50%,3px)", opacity: 0,
+            fontFamily: "JetBrains Mono,monospace", fontSize: "0.48rem",
+            color: "#F0C040", letterSpacing: "0.12em",
+            transition: "opacity 0.16s,transform 0.16s",
+          }}
+        >
+          OPEN
+        </span>
+      </div>
       <div
-        ref={dotRef}
+        ref={coreRef}
         style={{
-          position: "fixed", top: 0, left: 0, width: 8, height: 8,
-          borderRadius: "50%", background: "#F5F0E6", pointerEvents: "none",
-          zIndex: 99999, mixBlendMode: "difference", willChange: "transform",
+          position: "fixed", top: 0, left: 0, width: 4, height: 4,
+          borderRadius: "50%", background: "#F5F0E6",
+          pointerEvents: "none", zIndex: 99999, opacity: 0,
+          boxShadow: "0 0 8px rgba(240,192,64,0.45)",
+          willChange: "transform", transition: "opacity 0.18s,background 0.18s",
         }}
       />
     </>
