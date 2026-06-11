@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion } from "motion/react";
+import { Check, Copy, ExternalLink } from "lucide-react";
 
 function useInView(t = 0.08) {
   const ref = useRef<HTMLDivElement>(null);
@@ -13,18 +14,14 @@ function useInView(t = 0.08) {
 }
 
 const contacts = [
-  { label: "Email",    value: "mahakbansal017@gmail.com", copy: true,  href: null,                              accent: "#F0C040" },
-  { label: "Phone",    value: "+91 70674 10527",           copy: true,  href: null,                              accent: "#C9971C" },
-  { label: "LinkedIn", value: "linkedin.com/in/mahakbansal", copy: false, href: "https://linkedin.com/in/mahakbansal", accent: "#D4834A" },
+  { label: "Email",    value: "mahakbansal017@gmail.com", copy: true,  href: "mailto:mahakbansal017@gmail.com", accent: "#F0C040" },
+  { label: "Phone",    value: "+91 70674 10527",           copy: true,  href: "tel:+917067410527",               accent: "#C9971C" },
+  { label: "LinkedIn", value: "linkedin.com/in/mahakbansal25", copy: false, href: "https://www.linkedin.com/in/mahakbansal25/", accent: "#D4834A" },
 ];
 
 export function ContactScene() {
-  const sRef = useRef<HTMLDivElement>(null);
   const { ref, inView } = useInView(0.06);
   const [copied, setCopied] = useState<string | null>(null);
-  const { scrollYProgress } = useScroll({ target: sRef, offset: ["start end", "end end"] });
-  const headScale = useTransform(scrollYProgress, [0, 0.5], [0.88, 1]);
-  const headOp    = useTransform(scrollYProgress, [0, 0.35], [0, 1]);
 
   const copy = (val: string, label: string) => {
     navigator.clipboard.writeText(val.replace(/\s/g, ""));
@@ -33,7 +30,7 @@ export function ContactScene() {
   };
 
   return (
-    <div id="contact" ref={(n) => { (sRef as any).current = n; (ref as any).current = n; }}
+    <div id="contact" ref={ref}
       style={{ background: "#0A0800", minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
 
       {/* Ambient */}
@@ -52,7 +49,11 @@ export function ContactScene() {
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "2rem clamp(2rem,8vw,8rem)", position: "relative", zIndex: 5 }}>
         {/* Headline */}
-        <motion.h2 style={{ scale: headScale, opacity: headOp, fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "clamp(3.5rem,13vw,12rem)", lineHeight: 0.87, letterSpacing: "-0.05em", color: "#F5F0E6", margin: "0 0 clamp(2.5rem,5vw,4rem)" }}>
+        <motion.h2
+          initial={{ y: 28 }}
+          animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
+          transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          style={{ fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "clamp(2.75rem,7vw,6.5rem)", lineHeight: 0.96, letterSpacing: "-0.045em", color: "#F5F0E6", margin: "0 0 clamp(2.5rem,5vw,4rem)", transformOrigin: "left center" }}>
           Let's build<br />something<br /><span style={{ color: "#C9971C" }}>meaningful.</span>
         </motion.h2>
 
@@ -85,27 +86,46 @@ export function ContactScene() {
             {contacts.map((c, i) => (
               <motion.div key={c.label} whileHover={{ x: 6 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 style={{ borderTop: i === 0 ? "1px solid rgba(201,151,28,0.1)" : "none" }}>
-                {c.href ? (
-                  <a href={c.href} target="_blank" rel="noopener noreferrer"
-                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.5rem 0", borderBottom: "1px solid rgba(201,151,28,0.1)", textDecoration: "none", cursor: "none" }}>
-                    <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "1rem", borderBottom: "1px solid rgba(201,151,28,0.1)" }}>
+                  <a
+                    href={c.href}
+                    target={c.label === "LinkedIn" ? "_blank" : undefined}
+                    rel={c.label === "LinkedIn" ? "noopener noreferrer" : undefined}
+                    aria-label={`${c.label}: ${c.value}`}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flex: 1, minWidth: 0, padding: "1.5rem 0", textDecoration: "none", cursor: "none" }}
+                  >
+                    <div style={{ minWidth: 0 }}>
                       <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", fontWeight: 500, color: "#7A6A45", letterSpacing: "0.1em", marginBottom: "0.3rem" }}>{c.label.toUpperCase()}</div>
-                      <div style={{ fontFamily: "Inter, sans-serif", fontSize: "clamp(0.85rem,1.8vw,1.05rem)", color: "#F5F0E6", fontWeight: 500 }}>{c.value}</div>
+                      <div style={{ fontFamily: "Inter, sans-serif", fontSize: "clamp(0.85rem,1.8vw,1.05rem)", color: "#F5F0E6", fontWeight: 500, overflowWrap: "anywhere" }}>{c.value}</div>
                     </div>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", border: `1px solid ${c.accent}35`, background: `${c.accent}10`, display: "flex", alignItems: "center", justifyContent: "center", color: c.accent, fontSize: "1rem", flexShrink: 0 }}>↗</div>
+                    {!c.copy && (
+                      <span style={{ width: 38, height: 38, borderRadius: "50%", border: `1px solid ${c.accent}35`, background: `${c.accent}10`, display: "flex", alignItems: "center", justifyContent: "center", color: c.accent, flexShrink: 0 }}>
+                        <ExternalLink size={16} strokeWidth={1.8} aria-hidden="true" />
+                      </span>
+                    )}
                   </a>
-                ) : (
-                  <button onClick={() => copy(c.value, c.label)}
-                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.5rem 0", background: "none", border: "none", borderBottom: "1px solid rgba(201,151,28,0.1)" as any, width: "100%", textAlign: "left", cursor: "none" }}>
-                    <div>
-                      <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", fontWeight: 500, color: "#7A6A45", letterSpacing: "0.1em", marginBottom: "0.3rem" }}>{c.label.toUpperCase()}</div>
-                      <div style={{ fontFamily: "Inter, sans-serif", fontSize: "clamp(0.85rem,1.8vw,1.05rem)", color: "#F5F0E6", fontWeight: 500 }}>{copied === c.label ? "Copied ✓" : c.value}</div>
-                    </div>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", border: `1px solid ${copied === c.label ? c.accent : "rgba(201,151,28,0.2)"}`, background: copied === c.label ? `${c.accent}18` : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: copied === c.label ? c.accent : "#7A6A45", fontSize: "0.72rem", flexShrink: 0, fontFamily: "Inter, sans-serif", letterSpacing: "0.05em", transition: "all 0.3s" }}>
-                      {copied === c.label ? "✓" : "COPY"}
-                    </div>
-                  </button>
-                )}
+                  {c.copy && (
+                    <button
+                      type="button"
+                      data-cursor
+                      onClick={() => copy(c.value, c.label)}
+                      aria-label={`Copy ${c.label.toLowerCase()}`}
+                      title={copied === c.label ? "Copied" : `Copy ${c.label.toLowerCase()}`}
+                      style={{
+                        width: 38, height: 38, borderRadius: "50%", padding: 0,
+                        border: `1px solid ${copied === c.label ? c.accent : "rgba(201,151,28,0.22)"}`,
+                        background: copied === c.label ? `${c.accent}18` : "rgba(201,151,28,0.04)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        color: copied === c.label ? c.accent : "#7A6A45",
+                        flexShrink: 0, transition: "all 0.3s", cursor: "none",
+                      }}
+                    >
+                      {copied === c.label
+                        ? <Check size={16} strokeWidth={2} aria-hidden="true" />
+                        : <Copy size={16} strokeWidth={1.8} aria-hidden="true" />}
+                    </button>
+                  )}
+                </div>
               </motion.div>
             ))}
           </motion.div>

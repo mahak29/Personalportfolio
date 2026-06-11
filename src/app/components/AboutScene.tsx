@@ -79,9 +79,18 @@ function StatBox({ s, active, i }: { s: typeof STATS[0]; active: boolean; i: num
 }
 
 const skills = [
-  "React.js", "Next.js", "Node.js", "TypeScript",
-  "MongoDB", "Redis", "AWS Lambda", "WebSockets",
-  "BullMQ", "Stripe", "WhatsApp API", "CI/CD",
+  { name: "React.js", category: "Frontend", accent: "#61DAFB" },
+  { name: "Next.js", category: "Frontend", accent: "#F5F0E6" },
+  { name: "Node.js", category: "Backend", accent: "#68A063" },
+  { name: "TypeScript", category: "Language", accent: "#3178C6" },
+  { name: "MongoDB", category: "Database", accent: "#47A248" },
+  { name: "Redis", category: "Database", accent: "#DC382D" },
+  { name: "AWS Lambda", category: "Cloud", accent: "#FF9900" },
+  { name: "WebSockets", category: "Realtime", accent: "#F0C040" },
+  { name: "BullMQ", category: "Queues", accent: "#D4834A" },
+  { name: "Stripe", category: "Payments", accent: "#635BFF" },
+  { name: "WhatsApp API", category: "Integration", accent: "#25D366" },
+  { name: "CI/CD", category: "DevOps", accent: "#C9971C" },
 ];
 
 export function AboutScene() {
@@ -123,18 +132,85 @@ export function AboutScene() {
             </p>
 
             {/* Curated skill chips */}
-            <div style={{display:"flex",flexWrap:"wrap",gap:"0.5rem"}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(130px, 1fr))",gap:"0.65rem",maxWidth:520}}>
               {skills.map((s, i) => (
-                <motion.span key={s}
+                <motion.a
+                  key={s.name}
+                  href="#capabilities"
+                  data-cursor
                   initial={{opacity:0,y:8}} animate={inView?{opacity:1,y:0}:{}}
                   transition={{duration:0.35,delay:0.25+i*0.04,ease:[0.16,1,0.3,1]}}
-                  style={{fontFamily:"Inter,sans-serif",fontSize:"0.82rem",color:"#7A6A45",border:"1px solid rgba(201,151,28,0.15)",padding:"0.32rem 0.8rem",borderRadius:"2px",transition:"all 0.2s",cursor:"default"}}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color="#F0C040";(e.currentTarget as HTMLElement).style.borderColor="rgba(201,151,28,0.45)";(e.currentTarget as HTMLElement).style.background="rgba(201,151,28,0.05)";}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color="#7A6A45";(e.currentTarget as HTMLElement).style.borderColor="rgba(201,151,28,0.15)";(e.currentTarget as HTMLElement).style.background="transparent";}}>
-                  {s}
-                </motion.span>
+                  whileHover={{y:-4,scale:1.02,borderColor:`${s.accent}80`,boxShadow:`0 10px 30px ${s.accent}12`}}
+                  whileFocus={{y:-4,scale:1.02,borderColor:`${s.accent}80`}}
+                  whileTap={{scale:0.98}}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    document.getElementById("capabilities")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                  style={{
+                    position:"relative",overflow:"hidden",display:"flex",flexDirection:"column",
+                    minHeight:84,padding:"0.8rem 0.85rem",border:"1px solid rgba(201,151,28,0.14)",
+                    borderRadius:"4px",background:"linear-gradient(145deg, rgba(201,151,28,0.055), rgba(10,8,0,0.35))",
+                    fontFamily:"Inter,sans-serif",textDecoration:"none",outline:"none",
+                  }}
+                  aria-label={`View ${s.name} in the full skills section`}
+                >
+                  <span style={{position:"absolute",top:0,left:0,width:"45%",height:2,background:`linear-gradient(90deg, ${s.accent}, transparent)`}} />
+                  <span style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"0.8rem"}}>
+                    <span style={{fontFamily:"JetBrains Mono,monospace",fontSize:"0.62rem",color:s.accent,letterSpacing:"0.08em"}}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <motion.span
+                      aria-hidden="true"
+                      initial={{x:0,opacity:0.45}}
+                      whileHover={{x:3,opacity:1}}
+                      style={{fontSize:"0.8rem",color:s.accent}}
+                    >
+                      →
+                    </motion.span>
+                  </span>
+                  <span style={{fontSize:"0.84rem",fontWeight:600,color:"#F5F0E6",lineHeight:1.2,marginBottom:"0.25rem"}}>
+                    {s.name}
+                  </span>
+                  <span style={{fontSize:"0.62rem",color:"#7A6A45",letterSpacing:"0.08em",textTransform:"uppercase"}}>
+                    {s.category}
+                  </span>
+                </motion.a>
               ))}
             </div>
+
+            <motion.a
+              href="#capabilities"
+              data-cursor
+              initial={{opacity:0,y:8}}
+              animate={inView?{opacity:1,y:0}:{}}
+              transition={{duration:0.45,delay:0.75,ease:[0.16,1,0.3,1]}}
+              onClick={(event) => {
+                event.preventDefault();
+                document.getElementById("capabilities")?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+              style={{
+                display:"inline-flex",alignItems:"center",gap:"0.75rem",
+                marginTop:"1.5rem",padding:"0.75rem 1rem",
+                border:"1px solid rgba(201,151,28,0.3)",borderRadius:"3px",
+                color:"#C9971C",fontFamily:"Inter,sans-serif",fontSize:"0.82rem",
+                fontWeight:600,letterSpacing:"0.04em",textDecoration:"none",
+                transition:"background 0.25s, border-color 0.25s, color 0.25s",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = "rgba(201,151,28,0.1)";
+                e.currentTarget.style.borderColor = "rgba(201,151,28,0.55)";
+                e.currentTarget.style.color = "#F0C040";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.borderColor = "rgba(201,151,28,0.3)";
+                e.currentTarget.style.color = "#C9971C";
+              }}
+            >
+              Explore full stack
+              <span aria-hidden="true">→</span>
+            </motion.a>
           </motion.div>
 
           {/* Count-up stat grid */}
