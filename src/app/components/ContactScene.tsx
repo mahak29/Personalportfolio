@@ -96,7 +96,7 @@ export function ContactScene() {
                   </a>
                 ) : (
                   <button onClick={() => copy(c.value, c.label)}
-                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.5rem 0", borderBottom: "1px solid rgba(201,151,28,0.1)", background: "none", border: "none", borderBottom: "1px solid rgba(201,151,28,0.1)" as any, width: "100%", textAlign: "left", cursor: "none" }}>
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.5rem 0", background: "none", border: "none", borderBottom: "1px solid rgba(201,151,28,0.1)" as any, width: "100%", textAlign: "left", cursor: "none" }}>
                     <div>
                       <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", fontWeight: 500, color: "#7A6A45", letterSpacing: "0.1em", marginBottom: "0.3rem" }}>{c.label.toUpperCase()}</div>
                       <div style={{ fontFamily: "Inter, sans-serif", fontSize: "clamp(0.85rem,1.8vw,1.05rem)", color: "#F5F0E6", fontWeight: 500 }}>{copied === c.label ? "Copied ✓" : c.value}</div>
