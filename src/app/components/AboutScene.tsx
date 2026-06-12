@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 
 function useInView(threshold = 0.08) {
   const ref = useRef<HTMLDivElement>(null);
@@ -98,6 +98,7 @@ function StatBox({ stat, active, index }: { stat: typeof STATS[number]; active: 
       initial={{ opacity: 0, y: 20 }}
       animate={active ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay: 0.08 + index * 0.09 }}
+      whileHover={{ y: -5, backgroundColor: "#151000" }}
       style={{
         minHeight: 145,
         padding: "clamp(1.25rem,3vw,2rem)",
@@ -130,9 +131,6 @@ export function AboutScene() {
   const { ref, inView } = useInView();
   const [activeIndex, setActiveIndex] = useState(0);
   const active = principles[activeIndex];
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
-  const headingY = useTransform(scrollYProgress, [0.05, 0.35], [36, 0]);
-  const headingOpacity = useTransform(scrollYProgress, [0.05, 0.28], [0, 1]);
 
   const scrollToCapabilities = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
@@ -172,29 +170,55 @@ export function AboutScene() {
 
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1180, margin: "0 auto" }}>
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : {}}
+          initial={{ opacity: 0, x: -16 }}
+          animate={inView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
           style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "clamp(2.5rem,5vw,4rem)" }}
         >
           <span style={{ fontFamily: "Inter,sans-serif", fontSize: "0.72rem", color: "#C9971C", letterSpacing: "0.1em" }}>002</span>
-          <span style={{ width: 48, height: 1, background: "rgba(201,151,28,0.2)" }} />
+          <motion.span
+            initial={{ scaleX: 0 }}
+            animate={inView ? { scaleX: 1 } : {}}
+            transition={{ duration: 0.7, delay: 0.12 }}
+            style={{ width: 48, height: 1, background: "rgba(201,151,28,0.2)", transformOrigin: "left" }}
+          />
           <span style={{ fontFamily: "Inter,sans-serif", fontSize: "0.72rem", color: "#9A8758", letterSpacing: "0.1em" }}>ABOUT / SYSTEMS THINKING</span>
         </motion.div>
 
-        <motion.div style={{ y: headingY, opacity: headingOpacity, maxWidth: 940, marginBottom: "clamp(3rem,7vw,5rem)" }}>
+        <div style={{ maxWidth: 940, marginBottom: "clamp(3rem,7vw,5rem)" }}>
           <h2 style={{ fontFamily: "Inter,sans-serif", fontWeight: 800, fontSize: "clamp(2.35rem,6vw,5rem)", lineHeight: 0.98, letterSpacing: "-0.045em", color: "#F5F0E6", margin: "0 0 1.5rem" }}>
-            I build beyond the interface.
-            <br />
-            <span style={{ color: "transparent", WebkitTextStroke: "1.2px rgba(201,151,28,0.65)" }}>
-              I design the system behind it.
+            <span style={{ display: "block", overflow: "hidden", paddingBottom: "0.06em" }}>
+              <motion.span
+                initial={{ y: "110%", rotateX: -16 }}
+                animate={inView ? { y: "0%", rotateX: 0 } : {}}
+                transition={{ duration: 0.85, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+                style={{ display: "block", transformOrigin: "left bottom" }}
+              >
+                I build beyond the interface.
+              </motion.span>
+            </span>
+            <span style={{ display: "block", overflow: "hidden", paddingBottom: "0.08em" }}>
+              <motion.span
+                initial={{ y: "110%", rotateX: -16 }}
+                animate={inView ? { y: "0%", rotateX: 0 } : {}}
+                transition={{ duration: 0.9, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                style={{ display: "block", color: "transparent", WebkitTextStroke: "1.2px rgba(201,151,28,0.65)", transformOrigin: "left bottom" }}
+              >
+                I design the system behind it.
+              </motion.span>
             </span>
           </h2>
-          <p style={{ maxWidth: 700, margin: 0, fontFamily: "Inter,sans-serif", fontSize: "clamp(0.95rem,1.5vw,1.08rem)", color: "#9A8758", lineHeight: 1.85 }}>
+          <motion.p
+            initial={{ opacity: 0, y: 18 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 0.32, ease: [0.16, 1, 0.3, 1] }}
+            style={{ maxWidth: 700, margin: 0, fontFamily: "Inter,sans-serif", fontSize: "clamp(0.95rem,1.5vw,1.08rem)", color: "#9A8758", lineHeight: 1.85 }}
+          >
             Full Stack Engineer focused on system design, real-time products, and cloud-native platforms.
             I connect product intent to architecture, then carry it through APIs, data, infrastructure,
             observability, and the final user experience.
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
 
         <div className="about-grid" style={{ display: "grid", gridTemplateColumns: "0.9fr 1.1fr", gap: "clamp(2rem,6vw,5rem)", alignItems: "stretch", marginBottom: "clamp(3rem,7vw,5rem)" }}>
           <motion.div
@@ -206,13 +230,18 @@ export function AboutScene() {
             {principles.map((principle, index) => {
               const selected = activeIndex === index;
               return (
-                <button
+                <motion.button
                   key={principle.id}
                   type="button"
                   data-cursor
                   aria-pressed={selected}
                   onClick={() => setActiveIndex(index)}
                   onMouseEnter={() => setActiveIndex(index)}
+                  initial={{ opacity: 0, x: -18 }}
+                  animate={inView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.5, delay: 0.28 + index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={{ x: 6 }}
+                  whileTap={{ scale: 0.99 }}
                   style={{
                     position: "relative",
                     display: "grid",
@@ -235,7 +264,7 @@ export function AboutScene() {
                   </span>
                   <motion.span animate={{ x: selected ? 4 : 0, opacity: selected ? 1 : 0.35 }} style={{ color: principle.accent }}>→</motion.span>
                   {selected && <motion.span layoutId="about-active-line" style={{ position: "absolute", left: 0, insetBlock: 0, width: 2, background: principle.accent }} />}
-                </button>
+                </motion.button>
               );
             })}
 
@@ -254,6 +283,7 @@ export function AboutScene() {
             initial={{ opacity: 0, x: 24 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.75, delay: 0.18 }}
+            whileHover={{ y: -4, rotateY: -0.7 }}
             style={{ position: "relative", minHeight: 390, overflow: "hidden", border: "1px solid rgba(201,151,28,0.16)", borderRadius: 6, background: "linear-gradient(145deg, rgba(201,151,28,0.055), rgba(10,8,0,0.76))", padding: "clamp(1.5rem,4vw,2.5rem)" }}
           >
             <div
@@ -325,7 +355,12 @@ export function AboutScene() {
           </motion.div>
         </div>
 
-        <div style={{ marginBottom: "clamp(3rem,7vw,5rem)" }}>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.65, delay: 0.42 }}
+          style={{ marginBottom: "clamp(3rem,7vw,5rem)" }}
+        >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", gap: "1rem", marginBottom: "1.25rem", flexWrap: "wrap" }}>
             <div>
               <span style={{ fontFamily: "JetBrains Mono,monospace", fontSize: "0.65rem", color: "#C9971C", letterSpacing: "0.12em" }}>TOOLKIT</span>
@@ -355,7 +390,7 @@ export function AboutScene() {
               </motion.a>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}

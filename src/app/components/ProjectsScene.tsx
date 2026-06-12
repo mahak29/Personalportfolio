@@ -32,31 +32,31 @@ function useScramble(text: string, active: boolean) {
 const projects = [
   {
     index:"01", title:"Real Estate CRM", sub:"Lead-to-Conversion Platform", year:"2024–2026", type:"Production SaaS",
-    desc:"Built end-to-end — automated lead ingestion from Meta & Google Ads, RBAC for 4+ user types, WhatsApp drip sequences, and a unified payment layer across Razorpay, Cashfree & Stripe.",
+    desc:"A full-stack real estate CRM portfolio project built to automate lead capture, sales follow-ups, role-based workflows, WhatsApp communication, and online payments through one scalable SaaS platform.",
     stack:["React.js","Node.js","MongoDB","Redis","AWS Lambda","WhatsApp API","Razorpay"],
     numbers:[{v:"100%",l:"Manual entry cut"},{v:"−70%",l:"Follow-up time"},{v:"<200ms",l:"API at peak"},{v:"0",l:"Payment downtime"}],
     accent:"#C9971C", live:null,
   },
   {
     index:"02", title:"Live Streaming", sub:"SaaS Module", year:"2025", type:"Real-Time Infrastructure",
-    desc:"Token-based session management on Agora SDK with Node.js orchestration for concurrent multi-user streams. Sub-second latency under real-world load.",
+    desc:"A real-time live streaming SaaS module engineered with Agora SDK, Node.js, JWT authentication, and WebSockets to support secure multi-user video sessions with sub-second latency.",
     stack:["Node.js","Agora SDK","MongoDB","JWT","WebSockets"],
     numbers:[{v:"<1s",l:"Video latency"},{v:"100+",l:"Concurrent users"},{v:"JWT",l:"Secure sessions"},{v:"0",l:"Stream failures"}],
     accent:"#D4834A", live:null,
   },
   {
     index:"03", title:"B2C Marketplace", sub:"Tech Solutions Platform", year:"2022–2023", type:"Full-Stack Product",
-    desc:"Customer-to-vendor matching platform with smart filtering, Firebase auth, vendor inventory manager, and a complete admin panel for user and order lifecycle.",
+    desc:"A full-stack B2C marketplace portfolio project connecting customers with vendors through smart search, secure Firebase authentication, inventory management, and complete order administration.",
     stack:["React.js","Node.js","MongoDB","Firebase"],
     numbers:[{v:"1",l:"Sole developer"},{v:"0→1",l:"Built from scratch"},{v:"Full",l:"Order lifecycle"},{v:"3",l:"User role types"}],
     accent:"#F0C040", live:null,
   },
   {
-    index:"04", title:"Agriculture Export", sub:"International Website", year:"2022", type:"Live Production",
-    desc:"SEO-optimized production website for an international agricultural exporter supporting buyer acquisition across multiple global markets.",
+    index:"04", title:"Agriculture Export", sub:"Indian Client Project", year:"2022", type:"Indian Client Project",
+    desc:"An SEO-focused agriculture export portfolio project delivered for an Indian client, featuring responsive product presentation, clear business information, and a production-ready web experience.",
     stack:["HTML5","CSS3","Node.js"],
-    numbers:[{v:"Live",l:"In production"},{v:"SEO",l:"Optimized"},{v:"Global",l:"Market reach"},{v:"Solo",l:"Built & deployed"}],
-    accent:"#C9971C", live:"https://devagroexim.com",
+    numbers:[{v:"Live",l:"In production"},{v:"SEO",l:"Optimized"},{v:"India",l:"Client location"},{v:"Solo",l:"Built & deployed"}],
+    accent:"#C9971C", live:null,
   },
 ];
 
@@ -112,11 +112,11 @@ function ProjectCard({ project, idx }: { project:typeof projects[0]; idx:number 
           transition={{duration:0.85,ease:[0.16,1,0.3,1]}} className="project-copy" style={{order:isEven?0:1}}>
 
           {/* Clip-path title reveal */}
-          <div style={{overflow:"hidden",marginBottom:"0.5rem"}}>
+          <div style={{overflow:"hidden",marginBottom:"0.5rem",paddingBottom:"0.15em"}}>
             <motion.h3
               initial={{y:"100%"}} animate={inView?{y:"0%"}:{}}
               transition={{duration:0.8,delay:0.15,ease:[0.16,1,0.3,1]}}
-              style={{fontFamily:"Inter,sans-serif",fontWeight:800,fontSize:"clamp(2rem,5vw,3.75rem)",lineHeight:1.0,letterSpacing:"-0.04em",color:"#F5F0E6",margin:0}}>
+              style={{fontFamily:"Inter,sans-serif",fontWeight:800,fontSize:"clamp(2rem,5vw,3.75rem)",lineHeight:1.08,letterSpacing:"-0.04em",color:"#F5F0E6",margin:0}}>
               {scrambledTitle}
             </motion.h3>
           </div>
@@ -136,14 +136,6 @@ function ProjectCard({ project, idx }: { project:typeof projects[0]; idx:number 
             ))}
           </div>
 
-          {project.live && (
-            <a href={project.live} target="_blank" rel="noopener noreferrer"
-              style={{display:"inline-flex",alignItems:"center",gap:"0.4rem",fontFamily:"Inter,sans-serif",fontSize:"0.82rem",fontWeight:500,color:project.accent,textDecoration:"none",border:`1px solid ${project.accent}30`,padding:"0.5rem 1rem",borderRadius:"2px",transition:"background 0.2s"}}
-              onMouseEnter={e=>(e.currentTarget as HTMLElement).style.background=`${project.accent}12`}
-              onMouseLeave={e=>(e.currentTarget as HTMLElement).style.background="transparent"}>
-              Live ↗ {project.live.replace("https://","")}
-            </a>
-          )}
         </motion.div>
 
         {/* Right — tilt metric grid */}
@@ -182,7 +174,7 @@ export function ProjectsScene() {
           </motion.h2>
           <motion.p initial={{opacity:0}} animate={inView?{opacity:1}:{}} transition={{delay:0.3}}
             style={{fontFamily:"Inter,sans-serif",fontSize:"0.95rem",color:"#7A6A45",lineHeight:1.7,maxWidth:500,margin:0}}>
-            Four systems engineered from scratch — each starting with a real problem and ending with a measurable result.
+            Selected full-stack development portfolio projects spanning SaaS, CRM automation, live streaming, marketplaces, and SEO-focused client work.
           </motion.p>
         </div>
       </div>

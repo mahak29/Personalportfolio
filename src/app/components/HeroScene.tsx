@@ -1,7 +1,6 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "motion/react";
-
-const ThreeScene = lazy(() => import("./ThreeScene").then(module => ({ default: module.ThreeScene })));
+import { ThreeScene } from "./ThreeScene";
 
 // ── Text scramble hook ────────────────────────────────────────────────────────
 const SC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$";
@@ -25,7 +24,7 @@ function useScramble(text: string, active: boolean, delay = 0) {
 // ── Char-by-char name ─────────────────────────────────────────────────────────
 function AnimatedName({ ready }: { ready: boolean }) {
   const v = {
-    hidden:  { opacity: 1, y: 24, rotateX: -12 },
+    hidden:  { opacity: 0, y: 56, rotateX: -35 },
     visible: (i: number) => ({ opacity: 1, y: 0, rotateX: 0, transition: { delay: 0.45 + i * 0.055, duration: 0.75, ease: [0.16, 1, 0.3, 1] } }),
   };
   const first = "Mahak".split("");
@@ -66,7 +65,7 @@ function CyclingRole({ ready }: { ready: boolean }) {
     <motion.div
       initial={{ opacity: 0, x: 30 }}
       animate={ready ? { opacity: 1, x: 0 } : {}}
-      transition={{ delay: 0.45, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay: 1.1, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
       style={{
         width: "100%",
         /* Frosted gold backdrop so text is always readable against 3D scene */
@@ -143,7 +142,6 @@ export function HeroScene() {
   const rafRef     = useRef(0);
   const [ready, setReady] = useState(false);
   const [sp, setSp]       = useState(0);
-  const [showThree, setShowThree] = useState(false);
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
@@ -155,13 +153,6 @@ export function HeroScene() {
   const nameY2 = useSpring(useTransform(mouseY, [0, 1], [-5,  5]),  { stiffness: 55, damping: 18 });
 
   useEffect(() => { const t = setTimeout(() => setReady(true), 80); return () => clearTimeout(t); }, []);
-  useEffect(() => {
-    const media = window.matchMedia("(min-width: 901px) and (prefers-reduced-motion: no-preference)");
-    const update = () => setShowThree(media.matches);
-    update();
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
-  }, []);
   useEffect(() => scrollYProgress.on("change", setSp), [scrollYProgress]);
   useEffect(() => {
     const mm = (e: MouseEvent) => { mouseX.set(e.clientX / window.innerWidth); mouseY.set(e.clientY / window.innerHeight); };
@@ -174,26 +165,13 @@ export function HeroScene() {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext("2d")!;
     let W = 0, H = 0, mx = 0.5, my = 0.5;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const pixelRatio = Math.min(window.devicePixelRatio, 1.5);
-    const resize = () => {
-      W = canvas.offsetWidth;
-      H = canvas.offsetHeight;
-      canvas.width = Math.max(1, Math.round(W * pixelRatio));
-      canvas.height = Math.max(1, Math.round(H * pixelRatio));
-      ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    };
+    const resize = () => { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; };
     resize();
     window.addEventListener("resize", resize);
     const mm = (e: MouseEvent) => { mx = e.clientX / window.innerWidth; my = e.clientY / window.innerHeight; };
     window.addEventListener("mousemove", mm);
     let t = 0;
-    let visible = !document.hidden;
     const draw = () => {
-      if (!visible) {
-        rafRef.current = requestAnimationFrame(draw);
-        return;
-      }
       t += 0.005; ctx.clearRect(0, 0, W, H);
       for (let r = 0; r <= 16; r++) {
         const fy = r / 16, w = Math.sin(t + r * 0.4 + mx * 2.5) * H * 0.01;
@@ -208,17 +186,10 @@ export function HeroScene() {
       const g = ctx.createRadialGradient(mx * W, my * H, 0, mx * W, my * H, Math.min(W, H) * 0.45);
       g.addColorStop(0, "rgba(201,151,28,0.08)"); g.addColorStop(1, "transparent");
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-      if (!reducedMotion) rafRef.current = requestAnimationFrame(draw);
+      rafRef.current = requestAnimationFrame(draw);
     };
-    const onVisibility = () => { visible = !document.hidden; };
-    document.addEventListener("visibilitychange", onVisibility);
     draw();
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      document.removeEventListener("visibilitychange", onVisibility);
-      window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", mm);
-    };
+    return () => { cancelAnimationFrame(rafRef.current); window.removeEventListener("resize", resize); window.removeEventListener("mousemove", mm); };
   }, []);
 
   return (
@@ -238,11 +209,7 @@ export function HeroScene() {
 
       {/* Three.js — far right third only, so it doesn't clash with right panel */}
       <div className="three-scene-wrap" style={{ position: "absolute", top: 0, right: 0, width: "35%", height: "100%", zIndex: 2, opacity: 0.5, pointerEvents: "none" }}>
-        {showThree && (
-          <Suspense fallback={null}>
-            <ThreeScene scrollProgress={sp} />
-          </Suspense>
-        )}
+        <ThreeScene scrollProgress={sp} />
       </div>
 
       {/* Gradient only protects the far right where Three.js lives */}
@@ -281,7 +248,7 @@ export function HeroScene() {
             </motion.div>
 
             {/* Role */}
-            <motion.div initial={{ opacity: 0, x: -20 }} animate={ready ? { opacity: 1, x: 0 } : {}} transition={{ delay: 0.45, duration: 0.55 }}
+            <motion.div initial={{ opacity: 0, x: -20 }} animate={ready ? { opacity: 1, x: 0 } : {}} transition={{ delay: 1.1, duration: 0.6 }}
               style={{ display: "flex", alignItems: "center", gap: "0.875rem", marginBottom: "1.25rem" }}>
               <div style={{ width: 28, height: 1.5, background: "#C9971C", borderRadius: 1 }} />
               <span style={{ fontFamily: "Inter,sans-serif", fontWeight: 500, fontSize: "clamp(0.875rem,1.5vw,1.05rem)", color: "#C9971C" }}>
@@ -290,14 +257,14 @@ export function HeroScene() {
             </motion.div>
 
             {/* Summary */}
-            <motion.p initial={{ opacity: 0 }} animate={ready ? { opacity: 1 } : {}} transition={{ delay: 0.55, duration: 0.6 }}
+            <motion.p initial={{ opacity: 0 }} animate={ready ? { opacity: 1 } : {}} transition={{ delay: 1.25, duration: 0.7 }}
               style={{ fontFamily: "Inter,sans-serif", fontSize: "clamp(0.875rem,1.4vw,1rem)", color: "#7A6A45", lineHeight: 1.8, margin: "0 0 2.5rem", maxWidth: 420 }}>
               3+ years building scalable web applications, real-time systems,
               and cloud-native APIs that hold up in production.
             </motion.p>
 
             {/* CTAs */}
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={ready ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.65, duration: 0.55 }}
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={ready ? { opacity: 1, y: 0 } : {}} transition={{ delay: 1.4, duration: 0.6 }}
               style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}>
               <HeroButton href="#projects" primary>
                 Explore Projects
@@ -317,7 +284,7 @@ export function HeroScene() {
       </motion.div>
 
       {/* Scroll indicator */}
-      <motion.div initial={{ opacity: 0 }} animate={ready ? { opacity: 1 } : {}} transition={{ delay: 1 }}
+      <motion.div initial={{ opacity: 0 }} animate={ready ? { opacity: 1 } : {}} transition={{ delay: 2 }}
         style={{ position: "absolute", bottom: "2rem", left: "clamp(1.5rem,7vw,7rem)", zIndex: 20 }}>
         <motion.div animate={{ scaleY: [1, 0.12, 1] }} transition={{ repeat: Infinity, duration: 2.8, ease: "easeInOut" }}
           style={{ width: 1, height: 48, background: "linear-gradient(to bottom,rgba(201,151,28,0.7),transparent)", transformOrigin: "top" }} />

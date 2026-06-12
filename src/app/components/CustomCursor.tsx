@@ -42,16 +42,14 @@ export function CustomCursor() {
       current.y += (target.y - current.y) * 0.24;
 
       if (cursorRef.current) {
-        const size = interactive ? 50 : 34;
-        const scale = pressed ? 0.82 : 1;
-        cursorRef.current.style.width = `${size}px`;
-        cursorRef.current.style.height = `${size}px`;
+        const size = 28;
+        const scale = (interactive ? 1.35 : 1) * (pressed ? 0.82 : 1);
         cursorRef.current.style.opacity = visible ? "1" : "0";
         cursorRef.current.style.transform = `translate3d(${current.x - size / 2}px, ${current.y - size / 2}px, 0) scale(${scale})`;
         cursorRef.current.style.setProperty("--cursor-color", interactive ? "#F0C040" : "#C9971C");
       }
       if (coreRef.current) {
-        coreRef.current.style.transform = `translate3d(${target.x - 2}px, ${target.y - 2}px, 0) scale(${pressed ? 1.7 : 1})`;
+        coreRef.current.style.transform = `translate3d(${target.x - 1.5}px, ${target.y - 1.5}px, 0) scale(${pressed ? 1.6 : 1})`;
         coreRef.current.style.opacity = visible ? "1" : "0";
         coreRef.current.style.background = interactive ? "#F0C040" : "#F5F0E6";
       }
@@ -86,8 +84,8 @@ export function CustomCursor() {
 
   const corner = {
     position: "absolute" as const,
-    width: 8,
-    height: 8,
+    width: 7,
+    height: 7,
     borderColor: "var(--cursor-color)",
     transition: "border-color 0.2s",
   };
@@ -98,9 +96,9 @@ export function CustomCursor() {
         ref={cursorRef}
         style={{
           "--cursor-color": "#C9971C",
-          position: "fixed", top: 0, left: 0, width: 34, height: 34,
+          position: "fixed", top: 0, left: 0, width: 28, height: 28,
           pointerEvents: "none", zIndex: 99998, opacity: 0,
-          willChange: "transform,width,height", transition: "width 0.2s,height 0.2s,opacity 0.18s",
+          willChange: "transform", transition: "opacity 0.15s",
         } as React.CSSProperties}
       >
         <span style={{ ...corner, top: 0, left: 0, borderTop: "1px solid", borderLeft: "1px solid" }} />
@@ -123,7 +121,7 @@ export function CustomCursor() {
       <div
         ref={coreRef}
         style={{
-          position: "fixed", top: 0, left: 0, width: 4, height: 4,
+          position: "fixed", top: 0, left: 0, width: 3, height: 3,
           borderRadius: "50%", background: "#F5F0E6",
           pointerEvents: "none", zIndex: 99999, opacity: 0,
           boxShadow: "0 0 8px rgba(240,192,64,0.45)",

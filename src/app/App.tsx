@@ -1,25 +1,27 @@
 import { useEffect } from "react";
-import { Navigation }       from "./components/Navigation";
-import { HeroScene }        from "./components/HeroScene";
-import { MarqueeStrip }     from "./components/MarqueeStrip";
-import { AboutScene }       from "./components/AboutScene";
-import { ProjectsScene }    from "./components/ProjectsScene";
-import { ExperienceScene }  from "./components/ExperienceScene";
+import { AboutScene } from "./components/AboutScene";
 import { CapabilitiesScene } from "./components/CapabilitiesScene";
-import { ContactScene }     from "./components/ContactScene";
-import { CustomCursor }     from "./components/CustomCursor";
+import { ContactScene } from "./components/ContactScene";
+import { CustomCursor } from "./components/CustomCursor";
+import { DepthSection } from "./components/DepthSection";
+import { ExperienceScene } from "./components/ExperienceScene";
+import { HeroScene } from "./components/HeroScene";
+import { MarqueeStrip } from "./components/MarqueeStrip";
+import { Navigation } from "./components/Navigation";
+import { ProjectsScene } from "./components/ProjectsScene";
 
 export default function App() {
   useEffect(() => {
     document.documentElement.classList.add("dark");
     document.documentElement.style.scrollBehavior = "smooth";
-    document.body.style.background  = "#0A0800";
-    document.body.style.overflowX   = "hidden";
+    document.body.style.background = "#0A0800";
+    document.body.style.overflowX = "clip";
 
     const style = document.createElement("style");
     style.textContent = `
       *, *::before, *::after { box-sizing: border-box; }
       html { scroll-padding-top: 76px; }
+      html, body { overflow-x: clip; }
       body { margin: 0; }
       ::-webkit-scrollbar { display: none; }
       * { scrollbar-width: none; }
@@ -27,10 +29,27 @@ export default function App() {
       img, svg, canvas { max-width: 100%; }
       button, a { -webkit-tap-highlight-color: transparent; }
 
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      .depth-stage {
+        position: relative;
+      }
+      .depth-section {
+        isolation: isolate;
+        backface-visibility: hidden;
+      }
       @media (hover: hover) and (pointer: fine) {
         body, a, button, [data-cursor] { cursor: none !important; }
       }
-
       @media (max-width: 768px) {
         .about-grid,
         .proj-grid,
@@ -45,16 +64,17 @@ export default function App() {
           padding-left: 0 !important;
           padding-right: 0 !important;
         }
-        .contact-footer { align-items: flex-start !important; flex-direction: column; }
+        .contact-footer {
+          align-items: flex-start !important;
+          flex-direction: column;
+        }
       }
-
       @media (max-width: 480px) {
         .stat-grid,
         .project-metric-grid { grid-template-columns: 1fr !important; }
         .skill-card-grid { grid-template-columns: 1fr 1fr !important; }
         .experience-detail-grid { grid-template-columns: 1fr !important; }
       }
-
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto !important; }
         *, *::before, *::after {
@@ -70,30 +90,30 @@ export default function App() {
   }, []);
 
   return (
-    <div style={{ background: "#0A0800", minHeight: "100vh", color: "#F5F0E6", overflowX: "hidden" }}>
+    <div style={{ background: "#0A0800", minHeight: "100vh", color: "#F5F0E6", overflowX: "clip" }}>
       <CustomCursor />
       <Navigation />
-      <main>
-        {/* 1 — Hero: name, role, summary, CTAs */}
-        <HeroScene />
 
-        {/* Tech marquee bridge */}
-        <MarqueeStrip />
-
-        {/* 2 — About: summary paragraph + impact stats + skill chips */}
-        <AboutScene />
-
-        {/* 3 — Projects: 4 real projects */}
-        <ProjectsScene />
-
-        {/* 4 — Experience: 3 companies */}
-        <ExperienceScene />
-
-        {/* 5 — Stack: interactive capabilities */}
-        <CapabilitiesScene />
-
-        {/* 6 — Contact */}
-        <ContactScene />
+      <main className="depth-stage">
+        <DepthSection index={1} accent="#F0C040" gentle>
+          <HeroScene />
+          <MarqueeStrip />
+        </DepthSection>
+        <DepthSection index={2} accent="#C9971C">
+          <AboutScene />
+        </DepthSection>
+        <DepthSection index={3} accent="#D4834A" gentle>
+          <ProjectsScene />
+        </DepthSection>
+        <DepthSection index={4} accent="#F0C040">
+          <ExperienceScene />
+        </DepthSection>
+        <DepthSection index={5} accent="#C9971C">
+          <CapabilitiesScene />
+        </DepthSection>
+        <DepthSection index={6} accent="#D4834A" gentle>
+          <ContactScene />
+        </DepthSection>
       </main>
     </div>
   );
