@@ -4,8 +4,9 @@ import { Menu, X } from "lucide-react";
 
 const NAV = [
   { label: "About",      href: "#about" },
-  { label: "Work",       href: "#projects" },
+  { label: "Projects",   href: "#projects" },
   { label: "Experience", href: "#experience" },
+  { label: "Skills",     href: "#capabilities" },
   { label: "Contact",    href: "#contact" },
 ];
 
@@ -57,37 +58,19 @@ export function Navigation() {
           <a
             key={item.href}
             href={item.href}
+            className={item.href === "#contact" ? "nav-contact-link" : undefined}
             style={{
               fontFamily: "Inter, sans-serif", fontSize: "0.85rem",
-              color: "#7A6A45", textDecoration: "none",
-              transition: "color 0.2s",
+              color: item.href === "#contact" ? "#C9971C" : "#7A6A45",
+              textDecoration: "none",
+              transition: "color 0.2s, border-color 0.2s, background 0.2s",
             }}
             onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "#F5F0E6"}
-            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "#7A6A45"}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = item.href === "#contact" ? "#C9971C" : "#7A6A45"}
           >
             {item.label}
           </a>
         ))}
-        <a
-          href="#contact"
-          style={{
-            fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "0.82rem",
-            color: "#C9971C", textDecoration: "none",
-            border: "1px solid rgba(201,151,28,0.3)",
-            padding: "0.45rem 1.1rem", borderRadius: "3px",
-            transition: "all 0.25s",
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.background = "rgba(201,151,28,0.1)";
-            (e.currentTarget as HTMLElement).style.borderColor = "rgba(201,151,28,0.55)";
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.background = "transparent";
-            (e.currentTarget as HTMLElement).style.borderColor = "rgba(201,151,28,0.3)";
-          }}
-        >
-          Hire Me
-        </a>
       </div>
 
       <button
@@ -121,7 +104,7 @@ export function Navigation() {
               borderBottom: "1px solid rgba(201,151,28,0.14)",
             }}
           >
-            {[...NAV, { label: "Skills", href: "#capabilities" }].map(item => (
+            {NAV.map(item => (
               <a
                 key={item.href}
                 href={item.href}
@@ -142,6 +125,15 @@ export function Navigation() {
 
       <style>{`
         .mobile-menu-button, .mobile-menu { display: none; }
+        .nav-contact-link {
+          padding: 0.45rem 1rem;
+          border: 1px solid rgba(201,151,28,0.3);
+          border-radius: 3px;
+        }
+        .nav-contact-link:hover {
+          background: rgba(201,151,28,0.1);
+          border-color: rgba(201,151,28,0.55);
+        }
         @media (max-width: 820px) {
           .desktop-nav { display: none !important; }
           .mobile-menu-button { display: flex !important; }

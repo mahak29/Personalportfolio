@@ -1,7 +1,12 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-export function ThreeScene({ scrollProgress = 0 }: { scrollProgress?: number }) {
+type ThreeSceneProps = {
+  scrollProgress?: number;
+  onStatusChange?: (status: "ready" | "unavailable") => void;
+};
+
+export function ThreeScene({ scrollProgress = 0, onStatusChange }: ThreeSceneProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const groupRef = useRef<THREE.Group | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -12,7 +17,10 @@ export function ThreeScene({ scrollProgress = 0 }: { scrollProgress?: number }) 
     const mount = mountRef.current;
     if (!mount) return;
     const shouldDisable = window.matchMedia("(max-width: 900px), (prefers-reduced-motion: reduce)").matches;
-    if (shouldDisable) return;
+    if (shouldDisable) {
+      onStatusChange?.("unavailable");
+      return;
+    }
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(48, mount.clientWidth / mount.clientHeight, 0.1, 100);
@@ -38,10 +46,14 @@ export function ThreeScene({ scrollProgress = 0 }: { scrollProgress?: number }) 
         });
       }
     } catch {
+      onStatusChange?.("unavailable");
       return;
     }
 
-    if (!context) return;
+    if (!context) {
+      onStatusChange?.("unavailable");
+      return;
+    }
 
     let renderer: THREE.WebGLRenderer;
     try {
@@ -52,6 +64,7 @@ export function ThreeScene({ scrollProgress = 0 }: { scrollProgress?: number }) 
         alpha: true,
       });
     } catch {
+      onStatusChange?.("unavailable");
       return;
     }
 
@@ -135,13 +148,21 @@ export function ThreeScene({ scrollProgress = 0 }: { scrollProgress?: number }) 
       particles.rotation.y = t * 0.045;
       renderer.render(scene, camera);
     };
+    const onContextLost = (event: Event) => {
+      event.preventDefault();
+      onStatusChange?.("unavailable");
+    };
     const onVisibility = () => { visible = !document.hidden; };
     document.addEventListener("visibilitychange", onVisibility);
+    renderer.domElement.addEventListener("webglcontextlost", onContextLost);
+    renderer.render(scene, camera);
+    onStatusChange?.("ready");
     animate();
 
     return () => {
       cancelAnimationFrame(rafRef.current);
       document.removeEventListener("visibilitychange", onVisibility);
+      renderer.domElement.removeEventListener("webglcontextlost", onContextLost);
       window.removeEventListener("mousemove", onMM);
       window.removeEventListener("resize", onResize);
       renderer.dispose();
@@ -157,7 +178,7 @@ export function ThreeScene({ scrollProgress = 0 }: { scrollProgress?: number }) 
       (ringMesh.material as THREE.Material).dispose();
       if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [onStatusChange]);
 
   useEffect(() => {
     if (!groupRef.current) return;

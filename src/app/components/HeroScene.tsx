@@ -176,6 +176,7 @@ export function HeroScene() {
   const rafRef     = useRef(0);
   const [ready, setReady] = useState(false);
   const [sp, setSp]       = useState(0);
+  const [threeStatus, setThreeStatus] = useState<"loading" | "ready" | "unavailable">("loading");
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
@@ -187,6 +188,11 @@ export function HeroScene() {
   const nameY2 = useSpring(useTransform(mouseY, [0, 1], [-5,  5]),  { stiffness: 55, damping: 18 });
 
   useEffect(() => { const t = setTimeout(() => setReady(true), 80); return () => clearTimeout(t); }, []);
+  useEffect(() => {
+    if (threeStatus !== "loading") return;
+    const timeout = window.setTimeout(() => setThreeStatus("unavailable"), 1800);
+    return () => window.clearTimeout(timeout);
+  }, [threeStatus]);
   useEffect(() => scrollYProgress.on("change", setSp), [scrollYProgress]);
   useEffect(() => {
     const mm = (e: MouseEvent) => { mouseX.set(e.clientX / window.innerWidth); mouseY.set(e.clientY / window.innerHeight); };
@@ -197,7 +203,11 @@ export function HeroScene() {
   // Canvas grid
   useEffect(() => {
     const canvas = canvasRef.current; if (!canvas) return;
-    const ctx = canvas.getContext("2d")!;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      setThreeStatus("unavailable");
+      return;
+    }
     let W = 0, H = 0, mx = 0.5, my = 0.5;
     const resize = () => { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; };
     resize();
@@ -243,7 +253,29 @@ export function HeroScene() {
 
       {/* Three.js — far right third only, so it doesn't clash with right panel */}
       <div className="three-scene-wrap" style={{ position: "absolute", top: 0, right: 0, width: "35%", height: "100%", zIndex: 2, opacity: 0.5, pointerEvents: "none" }}>
-        <ThreeScene scrollProgress={sp} />
+        <ThreeScene scrollProgress={sp} onStatusChange={setThreeStatus} />
+        <AnimatePresence>
+          {threeStatus === "unavailable" && (
+            <motion.div
+              className="hero-visual-fallback"
+              initial={{ opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <motion.span
+                animate={{ opacity: [0.35, 1, 0.35] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                STAY TUNED
+              </motion.span>
+              <motion.i
+                animate={{ scaleX: [0.2, 1, 0.2], opacity: [0.3, 0.9, 0.3] }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Gradient only protects the far right where Three.js lives */}
@@ -407,6 +439,26 @@ export function HeroScene() {
           background-image: radial-gradient(rgba(245,240,230,0.18) 0.55px, transparent 0.55px);
           background-size: 5px 5px;
           mask-image: linear-gradient(to right, transparent 5%, black 70%, transparent);
+        }
+        .hero-visual-fallback {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.8rem;
+          color: rgba(240,192,64,0.7);
+          font-family: "JetBrains Mono", monospace;
+          font-size: clamp(0.65rem,1vw,0.78rem);
+          letter-spacing: 0.24em;
+        }
+        .hero-visual-fallback i {
+          display: block;
+          width: 72px;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, #F0C040, transparent);
+          transform-origin: center;
         }
         .hero-button {
           position: relative;
