@@ -1,184 +1,395 @@
-import { useRef, useEffect, useState } from "react";
-import { motion, useMotionValue, useSpring } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 
-function useInView(t = 0.1) {
+function useInView(threshold = 0.12) {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const el = ref.current; if (!el) return;
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold: t });
-    obs.observe(el); return () => obs.disconnect();
-  }, [t]);
-  return { ref, inView };
-}
 
-// Scramble text hook
-const SC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#";
-function useScramble(text: string, active: boolean) {
-  const [out, setOut] = useState(text);
   useEffect(() => {
-    if (!active) return;
-    let i = 0;
-    const iv = setInterval(() => {
-      setOut(text.split("").map((c,j)=> c===" " ? " " : j<Math.floor(i) ? c : SC[Math.floor(Math.random()*SC.length)]).join(""));
-      i += 0.45;
-      if (i > text.length+2) { clearInterval(iv); setOut(text); }
-    }, 28);
-    return () => clearInterval(iv);
-  }, [active, text]);
-  return out;
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setInView(true);
+      },
+      { threshold },
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return { ref, inView };
 }
 
 const projects = [
   {
-    index:"01", title:"Real Estate CRM", sub:"Lead-to-Conversion Platform", year:"2024–2026", type:"Production SaaS",
-    desc:"A full-stack real estate CRM portfolio project built to automate lead capture, sales follow-ups, role-based workflows, WhatsApp communication, and online payments through one scalable SaaS platform.",
-    stack:["React.js","Node.js","MongoDB","Redis","AWS Lambda","WhatsApp API","Razorpay"],
-    numbers:[{v:"100%",l:"Manual entry cut"},{v:"−70%",l:"Follow-up time"},{v:"<200ms",l:"API at peak"},{v:"0",l:"Payment downtime"}],
-    accent:"#C9971C", live:null,
+    index: "01",
+    title: "Real Estate CRM",
+    sub: "Lead-to-Conversion Platform",
+    year: "2024-2026",
+    type: "Production SaaS",
+    desc: "A full-stack real estate CRM portfolio project built to automate lead capture, sales follow-ups, role-based workflows, WhatsApp communication, and online payments through one scalable SaaS platform.",
+    stack: ["React.js", "Node.js", "MongoDB", "Redis", "AWS Lambda", "WhatsApp API", "Razorpay"],
+    numbers: [
+      { v: "100%", l: "Manual entry cut" },
+      { v: "-70%", l: "Follow-up time" },
+      { v: "<200ms", l: "API at peak" },
+      { v: "0", l: "Payment downtime" },
+    ],
+    accent: "#C9971C",
   },
   {
-    index:"02", title:"Live Streaming", sub:"SaaS Module", year:"2025", type:"Real-Time Infrastructure",
-    desc:"A real-time live streaming SaaS module engineered with Agora SDK, Node.js, JWT authentication, and WebSockets to support secure multi-user video sessions with sub-second latency.",
-    stack:["Node.js","Agora SDK","MongoDB","JWT","WebSockets"],
-    numbers:[{v:"<1s",l:"Video latency"},{v:"100+",l:"Concurrent users"},{v:"JWT",l:"Secure sessions"},{v:"0",l:"Stream failures"}],
-    accent:"#D4834A", live:null,
+    index: "02",
+    title: "Live Streaming",
+    sub: "Real-Time SaaS Module",
+    year: "2025",
+    type: "Real-Time Infrastructure",
+    desc: "A real-time live streaming SaaS module engineered with Agora SDK, Node.js, JWT authentication, and WebSockets to support secure multi-user video sessions with sub-second latency.",
+    stack: ["Node.js", "Agora SDK", "MongoDB", "JWT", "WebSockets"],
+    numbers: [
+      { v: "<1s", l: "Video latency" },
+      { v: "100+", l: "Concurrent users" },
+      { v: "JWT", l: "Secure sessions" },
+      { v: "0", l: "Stream failures" },
+    ],
+    accent: "#D4834A",
   },
   {
-    index:"03", title:"B2C Marketplace", sub:"Tech Solutions Platform", year:"2022–2023", type:"Full-Stack Product",
-    desc:"A full-stack B2C marketplace portfolio project connecting customers with vendors through smart search, secure Firebase authentication, inventory management, and complete order administration.",
-    stack:["React.js","Node.js","MongoDB","Firebase"],
-    numbers:[{v:"1",l:"Sole developer"},{v:"0→1",l:"Built from scratch"},{v:"Full",l:"Order lifecycle"},{v:"3",l:"User role types"}],
-    accent:"#F0C040", live:null,
+    index: "03",
+    title: "B2C Marketplace",
+    sub: "Tech Solutions Platform",
+    year: "2022-2023",
+    type: "Full-Stack Product",
+    desc: "A full-stack B2C marketplace portfolio project connecting customers with vendors through smart search, secure Firebase authentication, inventory management, and complete order administration.",
+    stack: ["React.js", "Node.js", "MongoDB", "Firebase"],
+    numbers: [
+      { v: "1", l: "Sole developer" },
+      { v: "0-1", l: "Built from scratch" },
+      { v: "Full", l: "Order lifecycle" },
+      { v: "3", l: "User role types" },
+    ],
+    accent: "#F0C040",
   },
   {
-    index:"04", title:"Agriculture Export", sub:"Indian Client Project", year:"2022", type:"Indian Client Project",
-    desc:"An SEO-focused agriculture export portfolio project delivered for an Indian client, featuring responsive product presentation, clear business information, and a production-ready web experience.",
-    stack:["HTML5","CSS3","Node.js"],
-    numbers:[{v:"Live",l:"In production"},{v:"SEO",l:"Optimized"},{v:"India",l:"Client location"},{v:"Solo",l:"Built & deployed"}],
-    accent:"#C9971C", live:null,
+    index: "04",
+    title: "Agriculture Export",
+    sub: "Indian Client Project",
+    year: "2022",
+    type: "SEO-Focused Delivery",
+    desc: "An SEO-focused agriculture export portfolio project delivered for an Indian client, featuring responsive product presentation, clear business information, and a production-ready digital experience.",
+    stack: ["HTML5", "CSS3", "Node.js"],
+    numbers: [
+      { v: "Live", l: "In production" },
+      { v: "SEO", l: "Optimized" },
+      { v: "India", l: "Client location" },
+      { v: "Solo", l: "Built and deployed" },
+    ],
+    accent: "#C9971C",
   },
 ];
 
-// 3D tilt metric box
-function TiltMetric({ n, accent, bg }: { n:{v:string;l:string}; accent:string; bg:string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const rx = useMotionValue(0);
-  const ry = useMotionValue(0);
-  const srx = useSpring(rx,{stiffness:200,damping:20});
-  const sry = useSpring(ry,{stiffness:200,damping:20});
-
-  const onMove = (e: React.MouseEvent) => {
-    const r = ref.current!.getBoundingClientRect();
-    const cx = (e.clientX - r.left) / r.width  - 0.5;
-    const cy = (e.clientY - r.top)  / r.height - 0.5;
-    rx.set(cy * -10); ry.set(cx * 10);
-  };
-  const onLeave = () => { rx.set(0); ry.set(0); };
-
-  return (
-    <motion.div ref={ref} style={{ rotateX:srx, rotateY:sry, transformPerspective:600, background:bg,
-      padding:"clamp(1.25rem,2.5vw,1.75rem)", display:"flex", flexDirection:"column", justifyContent:"space-between", minHeight:110 }}
-      onMouseMove={onMove} onMouseLeave={onLeave}>
-      <div style={{fontFamily:"Inter,sans-serif",fontWeight:800,fontSize:"clamp(1.6rem,3.5vw,2.6rem)",color:"#F5F0E6",letterSpacing:"-0.04em",lineHeight:1,marginBottom:"0.4rem"}}>
-        {n.v}
-      </div>
-      <div>
-        <div style={{width:18,height:2,background:accent,borderRadius:1,marginBottom:"0.4rem",opacity:0.7}} />
-        <div style={{fontFamily:"Inter,sans-serif",fontSize:"0.75rem",color:"#7A6A45",letterSpacing:"0.02em"}}>{n.l.toUpperCase()}</div>
-      </div>
-    </motion.div>
-  );
-}
-
-function ProjectCard({ project, idx }: { project:typeof projects[0]; idx:number }) {
-  const { ref, inView } = useInView(0.08);
-  const isEven = idx % 2 === 0;
-  const scrambledTitle = useScramble(project.title, inView);
-
-  return (
-    <div ref={ref} style={{ minHeight:"100vh", display:"flex", alignItems:"center", padding:"clamp(5rem,10vw,7rem) clamp(1.5rem,8vw,8rem)", background:isEven?"#0A0800":"#0F0B00", borderTop:"1px solid rgba(201,151,28,0.07)", position:"relative", overflow:"hidden" }}>
-
-      {/* Ghost index */}
-      <div style={{ position:"absolute", right:isEven?"3%":"auto", left:isEven?"auto":"3%", top:"50%", transform:"translateY(-50%)", fontFamily:"Inter,sans-serif", fontWeight:800, fontSize:"clamp(10rem,25vw,28rem)", color:project.accent, opacity:0.035, lineHeight:1, letterSpacing:"-0.07em", userSelect:"none", pointerEvents:"none" }}>
-        {project.index}
-      </div>
-
-      <div style={{ maxWidth:1200, margin:"0 auto", width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"clamp(3rem,8vw,8rem)", alignItems:"center", position:"relative", zIndex:1 }} className="proj-grid">
-
-        {/* Left */}
-        <motion.div
-          initial={{opacity:0,x:isEven?-48:48}} animate={inView?{opacity:1,x:0}:{}}
-          transition={{duration:0.85,ease:[0.16,1,0.3,1]}} className="project-copy" style={{order:isEven?0:1}}>
-
-          {/* Clip-path title reveal */}
-          <div style={{overflow:"hidden",marginBottom:"0.5rem",paddingBottom:"0.15em"}}>
-            <motion.h3
-              initial={{y:"100%"}} animate={inView?{y:"0%"}:{}}
-              transition={{duration:0.8,delay:0.15,ease:[0.16,1,0.3,1]}}
-              style={{fontFamily:"Inter,sans-serif",fontWeight:800,fontSize:"clamp(2rem,5vw,3.75rem)",lineHeight:1.08,letterSpacing:"-0.04em",color:"#F5F0E6",margin:0}}>
-              {scrambledTitle}
-            </motion.h3>
-          </div>
-
-          <div style={{display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"1.5rem",flexWrap:"wrap"}}>
-            <div style={{padding:"0.2rem 0.7rem",background:`${project.accent}14`,border:`1px solid ${project.accent}28`,borderRadius:"2px"}}>
-              <span style={{fontFamily:"Inter,sans-serif",fontSize:"0.72rem",fontWeight:500,color:project.accent,letterSpacing:"0.08em"}}>{project.type}</span>
-            </div>
-            <span style={{fontFamily:"Inter,sans-serif",fontSize:"0.72rem",color:"#7A6A45"}}>{project.year}</span>
-          </div>
-
-          <p style={{fontFamily:"Inter,sans-serif",fontSize:"0.9rem",color:"#7A6A45",lineHeight:1.85,margin:"0 0 2rem",maxWidth:420}}>{project.desc}</p>
-
-          <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem",marginBottom:"2rem"}}>
-            {project.stack.map(s => (
-              <span key={s} style={{fontFamily:"Inter,sans-serif",fontSize:"0.75rem",color:"#7A6A45",border:"1px solid rgba(201,151,28,0.14)",padding:"0.25rem 0.65rem",borderRadius:"2px"}}>{s}</span>
-            ))}
-          </div>
-
-        </motion.div>
-
-        {/* Right — tilt metric grid */}
-        <motion.div initial={{opacity:0,x:isEven?48:-48}} animate={inView?{opacity:1,x:0}:{}}
-          transition={{duration:0.85,delay:0.1,ease:[0.16,1,0.3,1]}} className="project-metrics" style={{order:isEven?1:0}}>
-          <div className="project-metric-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1px",background:"rgba(201,151,28,0.1)",border:"1px solid rgba(201,151,28,0.1)"}}>
-            {project.numbers.map((n,ni) => (
-              <TiltMetric key={ni} n={n} accent={project.accent} bg={ni%2===0?"#0A0800":"#0F0B00"} />
-            ))}
-          </div>
-          <div style={{display:"flex",alignItems:"center",gap:"0.75rem",marginTop:"1.5rem"}}>
-            <div style={{flex:1,height:1,background:`linear-gradient(to right,${project.accent}50,transparent)`}} />
-            <span style={{fontFamily:"Inter,sans-serif",fontSize:"0.72rem",color:"#7A6A45"}}>{project.index} / 04</span>
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
-
 export function ProjectsScene() {
-  const { ref, inView } = useInView(0.1);
+  const { ref, inView } = useInView();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const active = projects[activeIndex];
+
   return (
-    <div id="projects">
-      <div ref={ref} style={{background:"#0A0800",padding:"clamp(4rem,8vw,6rem) clamp(1.5rem,8vw,8rem) clamp(1rem,3vw,2rem)"}}>
-        <div style={{maxWidth:1200,margin:"0 auto"}}>
-          <motion.div initial={{opacity:0,y:20}} animate={inView?{opacity:1,y:0}:{}} transition={{duration:0.7}}
-            style={{display:"flex",alignItems:"center",gap:"1rem",marginBottom:"1.5rem"}}>
-            <span style={{fontFamily:"Inter,sans-serif",fontWeight:500,fontSize:"0.72rem",color:"#C9971C",letterSpacing:"0.1em"}}>Work</span>
-            <div style={{height:1,background:"rgba(201,151,28,0.2)",maxWidth:50,flex:1}} />
-          </motion.div>
-          <motion.h2 initial={{opacity:0,y:30}} animate={inView?{opacity:1,y:0}:{}} transition={{duration:0.9,delay:0.1,ease:[0.16,1,0.3,1]}}
-            style={{fontFamily:"Inter,sans-serif",fontWeight:800,fontSize:"clamp(2.5rem,7vw,5.5rem)",lineHeight:0.92,letterSpacing:"-0.04em",color:"#F5F0E6",margin:"0 0 clamp(1rem,2vw,1.5rem)"}}>
-            Work that shipped<br />
-            <span style={{color:"transparent",WebkitTextStroke:"1.5px rgba(201,151,28,0.5)"}}>and survived.</span>
+    <section
+      id="projects"
+      ref={ref}
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        background: "#0A0800",
+        padding: "clamp(5rem,9vw,8rem) clamp(1.25rem,7vw,7rem)",
+      }}
+    >
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          width: "min(52vw,720px)",
+          aspectRatio: "1",
+          right: "-20%",
+          top: "8%",
+          borderRadius: "50%",
+          background: `radial-gradient(circle, ${active.accent}12, transparent 68%)`,
+          transition: "background 0.5s ease",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 1180, margin: "0 auto" }}>
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+          style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.4rem" }}
+        >
+          <span style={{ fontFamily: "Inter,sans-serif", fontSize: "0.72rem", color: "#C9971C", letterSpacing: "0.12em" }}>
+            003 / SELECTED WORK
+          </span>
+          <span style={{ width: 54, height: 1, background: "rgba(201,151,28,0.22)" }} />
+        </motion.div>
+
+        <div className="projects-heading-grid">
+          <motion.h2
+            initial={{ opacity: 0, y: 26 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              fontFamily: "Inter,sans-serif",
+              fontWeight: 800,
+              fontSize: "clamp(2.6rem,6.5vw,5.4rem)",
+              lineHeight: 0.94,
+              letterSpacing: "-0.045em",
+              color: "#F5F0E6",
+              margin: 0,
+            }}
+          >
+            Built for the
+            <br />
+            <span style={{ color: "transparent", WebkitTextStroke: "1.3px rgba(201,151,28,0.58)" }}>real world.</span>
           </motion.h2>
-          <motion.p initial={{opacity:0}} animate={inView?{opacity:1}:{}} transition={{delay:0.3}}
-            style={{fontFamily:"Inter,sans-serif",fontSize:"0.95rem",color:"#7A6A45",lineHeight:1.7,maxWidth:500,margin:0}}>
-            Selected full-stack development portfolio projects spanning SaaS, CRM automation, live streaming, marketplaces, and SEO-focused client work.
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            style={{ alignSelf: "end", maxWidth: 430, margin: 0, color: "#8E7C52", fontFamily: "Inter,sans-serif", fontSize: "0.95rem", lineHeight: 1.75 }}
+          >
+            A concise full-stack portfolio spanning CRM automation, live streaming, marketplaces, and SEO-focused Indian client work.
           </motion.p>
         </div>
+
+        <div className="projects-showcase">
+          <div className="projects-index" role="tablist" aria-label="Portfolio projects">
+            {projects.map((project, index) => {
+              const selected = activeIndex === index;
+              return (
+                <motion.button
+                  key={project.index}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => setActiveIndex(index)}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={inView ? { opacity: 1, x: 0 } : {}}
+                  transition={{ duration: 0.45, delay: 0.2 + index * 0.07 }}
+                  className="project-index-button"
+                  style={{ color: selected ? "#F5F0E6" : "#7A6A45" }}
+                >
+                  <span style={{ color: selected ? project.accent : "#574B31" }}>{project.index}</span>
+                  <span>
+                    <strong>{project.title}</strong>
+                    <small>{project.sub}</small>
+                  </span>
+                  <motion.span animate={{ x: selected ? 4 : 0, opacity: selected ? 1 : 0.28 }} style={{ color: project.accent }}>
+                    -&gt;
+                  </motion.span>
+                  {selected && (
+                    <motion.span
+                      layoutId="project-active-line"
+                      style={{ position: "absolute", insetBlock: 0, left: 0, width: 2, background: project.accent }}
+                    />
+                  )}
+                </motion.button>
+              );
+            })}
+          </div>
+
+          <div className="project-case-study">
+            <AnimatePresence mode="wait">
+              <motion.article
+                key={active.index}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <div className="project-case-topline">
+                  <span style={{ color: active.accent }}>{active.type}</span>
+                  <span>{active.year}</span>
+                </div>
+
+                <h3>{active.title}</h3>
+                <p>{active.desc}</p>
+
+                <div className="project-metrics-row">
+                  {active.numbers.map((metric) => (
+                    <div key={metric.l}>
+                      <strong style={{ color: active.accent }}>{metric.v}</strong>
+                      <span>{metric.l}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="project-stack-row">
+                  {active.stack.map((technology) => (
+                    <span key={technology}>{technology}</span>
+                  ))}
+                </div>
+              </motion.article>
+            </AnimatePresence>
+
+            <div className="project-case-number" aria-hidden="true" style={{ color: active.accent }}>
+              {active.index}
+            </div>
+          </div>
+        </div>
       </div>
-      {projects.map((p,i) => <ProjectCard key={p.index} project={p} idx={i} />)}
-    </div>
+
+      <style>{`
+        .projects-heading-grid {
+          display: grid;
+          grid-template-columns: 1.15fr 0.85fr;
+          gap: clamp(2rem,6vw,6rem);
+          margin-bottom: clamp(2.75rem,6vw,4.5rem);
+        }
+        .projects-showcase {
+          display: grid;
+          grid-template-columns: minmax(260px,0.78fr) minmax(0,1.42fr);
+          min-height: 540px;
+          border: 1px solid rgba(201,151,28,0.14);
+          border-radius: 8px;
+          overflow: hidden;
+          background: rgba(15,11,0,0.72);
+          box-shadow: 0 24px 70px rgba(0,0,0,0.2);
+        }
+        .projects-index {
+          border-right: 1px solid rgba(201,151,28,0.12);
+          background: rgba(10,8,0,0.58);
+        }
+        .project-index-button {
+          position: relative;
+          display: grid;
+          grid-template-columns: 30px minmax(0,1fr) auto;
+          align-items: center;
+          gap: 0.8rem;
+          width: 100%;
+          min-height: 25%;
+          padding: 1.35rem 1.25rem;
+          border: 0;
+          border-bottom: 1px solid rgba(201,151,28,0.1);
+          background: transparent;
+          text-align: left;
+          cursor: pointer;
+        }
+        .project-index-button:last-child { border-bottom: 0; }
+        .project-index-button strong {
+          display: block;
+          font: 700 clamp(0.95rem,1.5vw,1.12rem)/1.2 Inter,sans-serif;
+          letter-spacing: -0.02em;
+        }
+        .project-index-button small {
+          display: block;
+          margin-top: 0.35rem;
+          color: #66593A;
+          font: 0.68rem/1.3 Inter,sans-serif;
+          letter-spacing: 0.04em;
+        }
+        .project-case-study {
+          position: relative;
+          display: flex;
+          align-items: center;
+          min-width: 0;
+          padding: clamp(2rem,5vw,4.25rem);
+          overflow: hidden;
+        }
+        .project-case-study article { position: relative; z-index: 1; width: 100%; }
+        .project-case-topline {
+          display: flex;
+          justify-content: space-between;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+          color: #7A6A45;
+          font: 600 0.68rem/1 Inter,sans-serif;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+        .project-case-study h3 {
+          max-width: 680px;
+          margin: 0 0 1rem;
+          color: #F5F0E6;
+          font: 800 clamp(2rem,4vw,3.65rem)/1.02 Inter,sans-serif;
+          letter-spacing: -0.045em;
+        }
+        .project-case-study p {
+          max-width: 690px;
+          margin: 0 0 2rem;
+          color: #8E7C52;
+          font: 0.9rem/1.8 Inter,sans-serif;
+        }
+        .project-metrics-row {
+          display: grid;
+          grid-template-columns: repeat(4,minmax(0,1fr));
+          border-block: 1px solid rgba(201,151,28,0.12);
+          margin-bottom: 1.75rem;
+        }
+        .project-metrics-row div {
+          padding: 1.1rem 0.75rem 1.1rem 0;
+          border-right: 1px solid rgba(201,151,28,0.1);
+        }
+        .project-metrics-row div:not(:first-child) { padding-left: 0.75rem; }
+        .project-metrics-row div:last-child { border-right: 0; }
+        .project-metrics-row strong {
+          display: block;
+          margin-bottom: 0.38rem;
+          font: 800 clamp(1.25rem,2.4vw,1.9rem)/1 Inter,sans-serif;
+          letter-spacing: -0.035em;
+        }
+        .project-metrics-row span {
+          display: block;
+          color: #66593A;
+          font: 0.62rem/1.35 Inter,sans-serif;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+        .project-stack-row { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+        .project-stack-row span {
+          padding: 0.32rem 0.65rem;
+          border: 1px solid rgba(201,151,28,0.14);
+          border-radius: 3px;
+          color: #8E7C52;
+          background: rgba(201,151,28,0.035);
+          font: 0.68rem/1 Inter,sans-serif;
+        }
+        .project-case-number {
+          position: absolute;
+          right: -0.04em;
+          bottom: -0.22em;
+          opacity: 0.035;
+          font: 800 clamp(12rem,23vw,22rem)/1 Inter,sans-serif;
+          letter-spacing: -0.08em;
+          pointer-events: none;
+          transition: color 0.4s ease;
+        }
+        @media(max-width:820px) {
+          .projects-heading-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+          .projects-showcase { grid-template-columns: 1fr; min-height: 0; }
+          .projects-index {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-right: 0;
+            border-bottom: 1px solid rgba(201,151,28,0.12);
+          }
+          .project-index-button {
+            min-height: 112px;
+            border-right: 1px solid rgba(201,151,28,0.1);
+          }
+          .project-case-study { min-height: 500px; }
+        }
+        @media(max-width:560px) {
+          .projects-index { grid-template-columns: 1fr; }
+          .project-index-button { min-height: 88px; }
+          .project-case-study { min-height: 0; padding: 1.5rem 1.2rem 1.8rem; }
+          .project-metrics-row { grid-template-columns: 1fr 1fr; }
+          .project-metrics-row div:nth-child(2) { border-right: 0; }
+          .project-metrics-row div:nth-child(-n+2) { border-bottom: 1px solid rgba(201,151,28,0.1); }
+        }
+      `}</style>
+    </section>
   );
 }

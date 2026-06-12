@@ -52,11 +52,8 @@ export default function App() {
       }
       @media (max-width: 768px) {
         .about-grid,
-        .proj-grid,
         .cap-grid,
         .contact-grid { grid-template-columns: 1fr !important; }
-        .project-copy,
-        .project-metrics { order: initial !important; }
         .stat-grid { grid-template-columns: 1fr 1fr !important; }
         .skill-detail-grid { grid-template-columns: 1fr !important; }
         .skill-detail-item {
@@ -70,8 +67,7 @@ export default function App() {
         }
       }
       @media (max-width: 480px) {
-        .stat-grid,
-        .project-metric-grid { grid-template-columns: 1fr !important; }
+        .stat-grid { grid-template-columns: 1fr !important; }
         .skill-card-grid { grid-template-columns: 1fr 1fr !important; }
         .experience-detail-grid { grid-template-columns: 1fr !important; }
       }
