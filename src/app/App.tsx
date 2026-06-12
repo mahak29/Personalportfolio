@@ -99,10 +99,11 @@ export default function App() {
         if (rect.top <= marker && rect.bottom > marker) nextId = id;
       }
 
-      if (nextId === activeId && window.location.hash === `#${nextId}`) return;
+      const nextHash = nextId === "identity" ? "" : `#${nextId}`;
+      if (nextId === activeId && window.location.hash === nextHash) return;
 
       activeId = nextId;
-      const url = `${window.location.pathname}${window.location.search}#${nextId}`;
+      const url = `${window.location.pathname}${window.location.search}${nextHash}`;
       window.history.replaceState(window.history.state, "", url);
     };
 

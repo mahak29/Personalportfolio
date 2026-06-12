@@ -17,6 +17,11 @@ export function Navigation() {
   const scrollToTop = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     setMobileOpen(false);
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${window.location.pathname}${window.location.search}`,
+    );
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -42,7 +47,7 @@ export function Navigation() {
       }}
     >
       {/* Logo */}
-      <a href="#identity" onClick={scrollToTop} style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "0.6rem" }}>
+      <a href="/" onClick={scrollToTop} style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "0.6rem" }}>
         <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "1.05rem", color: "#C9971C", letterSpacing: "-0.02em" }}>
           MB
         </span>
