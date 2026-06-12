@@ -41,7 +41,7 @@ export function Navigation() {
         </span>
         <span style={{ width: 1, height: 14, background: "rgba(201,151,28,0.2)", flexShrink: 0 }} />
         <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.78rem", color: "#7A6A45", fontWeight: 400 }}>
-          Full Stack Engineer
+          Full Stack Developer
         </span>
       </a>
 

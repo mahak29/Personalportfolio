@@ -229,10 +229,10 @@ export function ExperienceScene() {
             marginBottom: "clamp(3rem, 7vw, 5rem)",
           }}
         >
-          Where I've
+          Professional
           <br />
           <span style={{ color: "transparent", WebkitTextStroke: "1.5px rgba(201,151,28,0.5)" }}>
-            shipped.
+            experience.
           </span>
         </motion.h2>
 

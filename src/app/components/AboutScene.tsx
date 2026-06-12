@@ -194,7 +194,7 @@ export function AboutScene() {
                 transition={{ duration: 0.85, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
                 style={{ display: "block", transformOrigin: "left bottom" }}
               >
-                I build beyond the interface.
+                I build complete web products.
               </motion.span>
             </span>
             <span style={{ display: "block", overflow: "hidden", paddingBottom: "0.08em" }}>
@@ -204,7 +204,7 @@ export function AboutScene() {
                 transition={{ duration: 0.9, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
                 style={{ display: "block", color: "transparent", WebkitTextStroke: "1.2px rgba(201,151,28,0.65)", transformOrigin: "left bottom" }}
               >
-                I design the system behind it.
+                From interface to cloud.
               </motion.span>
             </span>
           </h2>
@@ -214,9 +214,9 @@ export function AboutScene() {
             transition={{ duration: 0.7, delay: 0.32, ease: [0.16, 1, 0.3, 1] }}
             style={{ maxWidth: 700, margin: 0, fontFamily: "Inter,sans-serif", fontSize: "clamp(0.95rem,1.5vw,1.08rem)", color: "#9A8758", lineHeight: 1.85 }}
           >
-            Full Stack Engineer focused on system design, real-time products, and cloud-native platforms.
-            I connect product intent to architecture, then carry it through APIs, data, infrastructure,
-            observability, and the final user experience.
+            I am a full stack developer based in Ahmedabad, working with React, Node.js, TypeScript,
+            MongoDB, Redis, and AWS. I turn product ideas into fast, secure, and scalable web
+            applications, from frontend design and APIs to databases, deployment, and monitoring.
           </motion.p>
         </div>
 
@@ -364,7 +364,7 @@ export function AboutScene() {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", gap: "1rem", marginBottom: "1.25rem", flexWrap: "wrap" }}>
             <div>
               <span style={{ fontFamily: "JetBrains Mono,monospace", fontSize: "0.65rem", color: "#C9971C", letterSpacing: "0.12em" }}>TOOLKIT</span>
-              <h3 style={{ fontFamily: "Inter,sans-serif", fontSize: "clamp(1.25rem,2.5vw,1.8rem)", color: "#F5F0E6", margin: "0.45rem 0 0" }}>From architecture to delivery.</h3>
+              <h3 style={{ fontFamily: "Inter,sans-serif", fontSize: "clamp(1.25rem,2.5vw,1.8rem)", color: "#F5F0E6", margin: "0.45rem 0 0" }}>Tools I use to build and launch products.</h3>
             </div>
             <span style={{ fontFamily: "Inter,sans-serif", fontSize: "0.75rem", color: "#9A8758" }}>{skills.length} CORE CAPABILITIES</span>
           </div>

@@ -27,49 +27,49 @@ const stacks = [
     code: "ARCH",
     items: ["High-Level Design", "Low-Level Design", "Scalability Patterns", "Load Balancing", "Caching Strategies", "Message Queues", "Event-Driven Architecture", "API Gateway Patterns", "Observability"],
     accent: "#F0C040",
-    summary: "Designing resilient distributed systems from service boundaries and data flow to scaling, failure recovery, and observability.",
+    summary: "Planning clear system architecture, data flow, APIs, caching, queues, scaling, monitoring, and recovery.",
   },
   {
     area: "Frontend",
     code: "UI",
     items: ["React.js", "Next.js", "TypeScript", "JavaScript", "Redux Toolkit", "RTK Query", "TanStack Query", "HTML5 / CSS3", "Flutter & Dart"],
     accent: "#61DAFB",
-    summary: "Production-grade interfaces with thoughtful state management, accessibility, and real-world performance optimization.",
+    summary: "Building responsive and accessible React interfaces with clean state management and strong performance.",
   },
   {
     area: "Backend",
     code: "API",
     items: ["Node.js", "Express.js", "REST API Design", "JWT Auth", "Serverless Architecture", "Microservices", "BullMQ", "Worker Threads", "WebSockets"],
     accent: "#C9971C",
-    summary: "Scalable APIs and event-driven architectures engineered to remain reliable under peak load.",
+    summary: "Building secure Node.js APIs, background jobs, WebSockets, and serverless services that handle growing traffic.",
   },
   {
     area: "Databases",
     code: "DATA",
     items: ["MongoDB", "MySQL / SQL", "Firebase / Firestore", "Redis (Pub/Sub & Cache)"],
     accent: "#D4834A",
-    summary: "Data modeling, query optimization, indexing, caching, and persistence strategies shaped around product behavior.",
+    summary: "Designing practical database models, indexes, queries, caching, and storage for real product needs.",
   },
   {
     area: "Cloud & DevOps",
     code: "OPS",
     items: ["AWS Lambda", "Amazon API Gateway", "CloudFront", "GCP", "CI/CD Pipelines", "Git / GitHub", "Agile / Scrum"],
     accent: "#E8D4A3",
-    summary: "Serverless-first cloud architecture supported by observable infrastructure and automated delivery pipelines.",
+    summary: "Deploying AWS serverless applications with CI/CD, CloudFront, API Gateway, monitoring, and reliable releases.",
   },
   {
     area: "Integrations",
     code: "EXT",
     items: ["WhatsApp Business API", "Meta Ads API", "Google Ads API", "Razorpay", "Cashfree", "Stripe", "RevenueCat", "Agora SDK"],
     accent: "#25D366",
-    summary: "Third-party services integrated cleanly across payments, messaging, advertising, and real-time media.",
+    summary: "Connecting payment, messaging, advertising, and live video APIs with secure and reliable workflows.",
   },
   {
     area: "AI & Tools",
     code: "AI",
     items: ["LLM Agents", "GitHub Copilot", "Prompt Engineering", "Automated Scaffolding"],
     accent: "#C9971C",
-    summary: "Using AI as an engineering multiplier for exploration, delivery, and repeatable development workflows.",
+    summary: "Using AI tools to research faster, improve development workflows, and deliver repeatable solutions.",
   },
 ];
 
@@ -129,12 +129,12 @@ export function CapabilitiesScene() {
               transition={{ duration: 0.7 }}
               style={{ maxWidth: 720, margin: 0, fontFamily: "Inter,sans-serif", fontSize: "clamp(2.4rem,6vw,5rem)", fontWeight: 800, lineHeight: 0.94, letterSpacing: "-0.05em", color: "#F5F0E6" }}
             >
-              One stack.
+              Full-stack skills.
               <br />
-              <span style={{ color: active.accent }}>Multiple signals.</span>
+              <span style={{ color: active.accent }}>Built for production.</span>
             </motion.h2>
             <p style={{ maxWidth: 310, margin: 0, fontFamily: "Inter,sans-serif", fontSize: "0.9rem", color: "#9A8758", lineHeight: 1.7 }}>
-              Select a channel to inspect the tools, patterns, and engineering depth behind each layer.
+              Explore the technologies I use for frontend, backend, databases, cloud deployment, integrations, and system design.
             </p>
           </div>
 

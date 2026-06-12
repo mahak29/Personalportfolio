@@ -54,14 +54,15 @@ export function ContactScene() {
           animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
           transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           style={{ fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "clamp(2.75rem,7vw,6.5rem)", lineHeight: 0.96, letterSpacing: "-0.045em", color: "#F5F0E6", margin: "0 0 clamp(2.5rem,5vw,4rem)", transformOrigin: "left center" }}>
-          Let's build<br />something<br /><span style={{ color: "#C9971C" }}>meaningful.</span>
+          Need a full-stack<br />developer for your<br /><span style={{ color: "#C9971C" }}>next product?</span>
         </motion.h2>
 
         <div className="contact-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(2rem,6vw,6rem)", alignItems: "start" }}>
           {/* Left */}
           <motion.div initial={{ opacity: 0, y: 24 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.8, delay: 0.2 }}>
             <p style={{ fontFamily: "Inter, sans-serif", fontSize: "1rem", color: "#7A6A45", lineHeight: 1.85, margin: "0 0 2.5rem", maxWidth: 380 }}>
-              I'm interested in problems worth solving — complex distributed systems, product ideas that need engineering clarity, or just a conversation about architecture.
+              I am open to full-time roles, freelance projects, and product collaborations.
+              Contact me for React, Node.js, SaaS, API integration, real-time features, or AWS development.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               {[
@@ -135,8 +136,8 @@ export function ContactScene() {
       {/* Footer */}
       <motion.div className="contact-footer" initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ delay: 0.8 }}
         style={{ padding: "2rem clamp(2rem,8vw,8rem)", borderTop: "1px solid rgba(201,151,28,0.07)", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", zIndex: 5, flexWrap: "wrap", gap: "0.75rem" }}>
-        <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", color: "#7A6A45", opacity: 0.5, letterSpacing: "0.1em" }}>MAHAK BANSAL © 2022</span>
-        <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", color: "#7A6A45", opacity: 0.5, letterSpacing: "0.1em" }}>FULL STACK ENGINEER · AHMEDABAD, INDIA</span>
+        <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", color: "#7A6A45", opacity: 0.5, letterSpacing: "0.1em" }}>MAHAK BANSAL (C) 2026</span>
+        <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", color: "#7A6A45", opacity: 0.5, letterSpacing: "0.1em" }}>FULL STACK DEVELOPER · AHMEDABAD, INDIA</span>
       </motion.div>
     </div>
   );

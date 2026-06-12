@@ -31,26 +31,40 @@ function AnimatedName({ ready }: { ready: boolean }) {
   const last  = "Bansal".split("");
   return (
     <div style={{ perspective: 900 }}>
-      <div>
-        <h1 style={{ fontFamily: "Inter,sans-serif", fontWeight: 800, fontSize: "clamp(4rem, 11vw, 10rem)", letterSpacing: "-0.05em", color: "#F5F0E6", margin: 0, lineHeight: 0.88, display: "flex" }}>
+      <h1 aria-label="Mahak Bansal, Full Stack Developer" style={{ margin: 0 }}>
+        <span style={{ fontFamily: "Inter,sans-serif", fontWeight: 800, fontSize: "clamp(4rem, 11vw, 10rem)", letterSpacing: "-0.05em", color: "#F5F0E6", lineHeight: 0.88, display: "flex" }}>
           {first.map((ch, i) => <motion.span key={i} custom={i} variants={v} initial="hidden" animate={ready ? "visible" : "hidden"} style={{ display: "inline-block" }}>{ch}</motion.span>)}
-        </h1>
-      </div>
-      <div>
-        <h1 style={{ fontFamily: "Inter,sans-serif", fontWeight: 800, fontSize: "clamp(4rem, 11vw, 10rem)", letterSpacing: "-0.05em", margin: 0, lineHeight: 0.88, display: "flex", color: "transparent", WebkitTextStroke: "1.5px rgba(201,151,28,0.65)" }}>
+        </span>
+        <span style={{ fontFamily: "Inter,sans-serif", fontWeight: 800, fontSize: "clamp(4rem, 11vw, 10rem)", letterSpacing: "-0.05em", lineHeight: 0.88, display: "flex", color: "transparent", WebkitTextStroke: "1.5px rgba(201,151,28,0.65)" }}>
           {last.map((ch, i) => <motion.span key={i} custom={first.length + i} variants={v} initial="hidden" animate={ready ? "visible" : "hidden"} style={{ display: "inline-block" }}>{ch}</motion.span>)}
-        </h1>
-      </div>
+        </span>
+      </h1>
     </div>
   );
 }
 
 // ── Cycling roles (right panel) ───────────────────────────────────────────────
 const ROLES = [
-  { text: "Full Stack\nEngineer",        sub: "React · Node.js · TypeScript" },
-  { text: "AWS Serverless\nArchitect",   sub: "Lambda · API Gateway · CloudFront" },
-  { text: "Real-Time\nSystems Builder",  sub: "Redis · WebSockets · BullMQ" },
-  { text: "API Integration\nSpecialist", sub: "WhatsApp · Stripe · Agora SDK" },
+  {
+    text: "Full Stack\nDevelopment",
+    sub: "React · Node.js · TypeScript · MongoDB",
+    detail: "Building complete, responsive web applications from user interface to API, database, and deployment.",
+  },
+  {
+    text: "SaaS & CRM\nAutomation",
+    sub: "Lead Capture · WhatsApp · Payments",
+    detail: "Creating business platforms that automate sales workflows, team access, follow-ups, and payment operations.",
+  },
+  {
+    text: "Real-Time\nSystems",
+    sub: "Agora · WebSockets · Redis · BullMQ",
+    detail: "Developing live video, instant updates, queues, and event-driven features designed for speed and reliability.",
+  },
+  {
+    text: "Cloud & API\nIntegrations",
+    sub: "AWS · Meta · Google · Razorpay · Stripe",
+    detail: "Connecting cloud services and third-party APIs through secure, scalable, and production-ready workflows.",
+  },
 ];
 
 function CyclingRole({ ready }: { ready: boolean }) {
@@ -76,8 +90,12 @@ function CyclingRole({ ready }: { ready: boolean }) {
         padding: "clamp(2rem,4vw,3rem)",
       }}
     >
+      <div style={{ marginBottom: "1.15rem", fontFamily: "JetBrains Mono,monospace", fontSize: "0.62rem", color: "#C9971C", letterSpacing: "0.14em" }}>
+        CORE SPECIALTY / {String(idx + 1).padStart(2, "0")}
+      </div>
+
       {/* Cycling text */}
-      <div style={{ position: "relative", height: "clamp(7rem,14vw,12rem)", overflow: "hidden", marginBottom: "1.25rem" }}>
+      <div style={{ position: "relative", height: "clamp(6rem,11vw,9rem)", overflow: "hidden", marginBottom: "1rem" }}>
         <AnimatePresence mode="wait">
           <motion.p
             key={idx}
@@ -108,13 +126,26 @@ function CyclingRole({ ready }: { ready: boolean }) {
         <motion.p key={`s-${idx}`}
           initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.35 }}
-          style={{ fontFamily: "Inter,sans-serif", fontSize: "0.85rem", color: "#7A6A45", margin: 0 }}>
+          style={{ fontFamily: "Inter,sans-serif", fontSize: "0.78rem", color: "#C9971C", margin: 0, lineHeight: 1.5 }}>
           {ROLES[idx].sub}
         </motion.p>
       </AnimatePresence>
 
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={`d-${idx}`}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.38, delay: 0.04 }}
+          style={{ maxWidth: 360, margin: "0.85rem 0 0", fontFamily: "Inter,sans-serif", fontSize: "0.8rem", color: "#8E7C52", lineHeight: 1.65 }}
+        >
+          {ROLES[idx].detail}
+        </motion.p>
+      </AnimatePresence>
+
       {/* Gold accent bar at bottom */}
-      <div style={{ height: 2, background: "linear-gradient(to right,rgba(201,151,28,0.6),transparent)", borderRadius: 1, marginTop: "1.5rem" }} />
+      <div style={{ height: 2, background: "linear-gradient(to right,rgba(201,151,28,0.6),transparent)", borderRadius: 1, marginTop: "1.25rem" }} />
     </motion.div>
   );
 }
@@ -252,15 +283,15 @@ export function HeroScene() {
               style={{ display: "flex", alignItems: "center", gap: "0.875rem", marginBottom: "1.25rem" }}>
               <div style={{ width: 28, height: 1.5, background: "#C9971C", borderRadius: 1 }} />
               <span style={{ fontFamily: "Inter,sans-serif", fontWeight: 500, fontSize: "clamp(0.875rem,1.5vw,1.05rem)", color: "#C9971C" }}>
-                Full Stack Engineer
+                Full Stack Developer
               </span>
             </motion.div>
 
             {/* Summary */}
             <motion.p initial={{ opacity: 0 }} animate={ready ? { opacity: 1 } : {}} transition={{ delay: 1.25, duration: 0.7 }}
               style={{ fontFamily: "Inter,sans-serif", fontSize: "clamp(0.875rem,1.4vw,1rem)", color: "#7A6A45", lineHeight: 1.8, margin: "0 0 2.5rem", maxWidth: 420 }}>
-              3+ years building scalable web applications, real-time systems,
-              and cloud-native APIs that hold up in production.
+              Full stack developer with 3+ years of experience building React and Node.js
+              applications, SaaS products, real-time features, and AWS cloud APIs.
             </motion.p>
 
             {/* CTAs */}

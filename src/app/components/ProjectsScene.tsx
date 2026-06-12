@@ -30,7 +30,7 @@ const projects = [
     sub: "Lead-to-Conversion Platform",
     year: "2024-2026",
     type: "Production SaaS",
-    desc: "A full-stack real estate CRM portfolio project built to automate lead capture, sales follow-ups, role-based workflows, WhatsApp communication, and online payments through one scalable SaaS platform.",
+    desc: "A scalable real estate CRM and SaaS platform built with React, Node.js, MongoDB, Redis, and AWS. It automates lead capture, sales follow-ups, WhatsApp messages, team roles, and online payments.",
     stack: ["React.js", "Node.js", "MongoDB", "Redis", "AWS Lambda", "WhatsApp API", "Razorpay"],
     numbers: [
       { v: "100%", l: "Manual entry cut" },
@@ -46,7 +46,7 @@ const projects = [
     sub: "Real-Time SaaS Module",
     year: "2025",
     type: "Real-Time Infrastructure",
-    desc: "A real-time live streaming SaaS module engineered with Agora SDK, Node.js, JWT authentication, and WebSockets to support secure multi-user video sessions with sub-second latency.",
+    desc: "A secure live streaming module built with Node.js, Agora SDK, JWT, MongoDB, and WebSockets. It supports multi-user video sessions with sub-second latency and reliable access control.",
     stack: ["Node.js", "Agora SDK", "MongoDB", "JWT", "WebSockets"],
     numbers: [
       { v: "<1s", l: "Video latency" },
@@ -62,7 +62,7 @@ const projects = [
     sub: "Tech Solutions Platform",
     year: "2022-2023",
     type: "Full-Stack Product",
-    desc: "A full-stack B2C marketplace portfolio project connecting customers with vendors through smart search, secure Firebase authentication, inventory management, and complete order administration.",
+    desc: "A full-stack B2C marketplace built with React, Node.js, MongoDB, and Firebase. Customers can find vendors, while vendors and admins manage products, users, orders, and inventory.",
     stack: ["React.js", "Node.js", "MongoDB", "Firebase"],
     numbers: [
       { v: "1", l: "Sole developer" },
@@ -78,7 +78,7 @@ const projects = [
     sub: "Indian Client Project",
     year: "2022",
     type: "SEO-Focused Delivery",
-    desc: "An SEO-focused agriculture export portfolio project delivered for an Indian client, featuring responsive product presentation, clear business information, and a production-ready digital experience.",
+    desc: "An SEO-friendly agriculture export project delivered for an Indian client. The responsive experience presents products and company information clearly and is ready for real customer enquiries.",
     stack: ["HTML5", "CSS3", "Node.js"],
     numbers: [
       { v: "Live", l: "In production" },
@@ -149,9 +149,9 @@ export function ProjectsScene() {
               margin: 0,
             }}
           >
-            Built for the
+            Full-stack projects
             <br />
-            <span style={{ color: "transparent", WebkitTextStroke: "1.3px rgba(201,151,28,0.58)" }}>real world.</span>
+            <span style={{ color: "transparent", WebkitTextStroke: "1.3px rgba(201,151,28,0.58)" }}>built for real users.</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
@@ -159,7 +159,7 @@ export function ProjectsScene() {
             transition={{ duration: 0.7, delay: 0.2 }}
             style={{ alignSelf: "end", maxWidth: 430, margin: 0, color: "#8E7C52", fontFamily: "Inter,sans-serif", fontSize: "0.95rem", lineHeight: 1.75 }}
           >
-            A concise full-stack portfolio spanning CRM automation, live streaming, marketplaces, and SEO-focused Indian client work.
+            Selected React and Node.js projects covering SaaS development, CRM automation, live streaming, marketplaces, and SEO-friendly client work.
           </motion.p>
         </div>
 
