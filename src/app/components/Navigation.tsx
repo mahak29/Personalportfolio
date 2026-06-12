@@ -13,6 +13,12 @@ export function Navigation() {
   const [scrolled, setScrolled]   = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const scrollToTop = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    setMobileOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", h, { passive: true });
@@ -35,7 +41,7 @@ export function Navigation() {
       }}
     >
       {/* Logo */}
-      <a href="#identity" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "0.6rem" }}>
+      <a href="#identity" onClick={scrollToTop} style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "0.6rem" }}>
         <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "1.05rem", color: "#C9971C", letterSpacing: "-0.02em" }}>
           MB
         </span>

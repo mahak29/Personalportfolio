@@ -150,18 +150,21 @@ function CyclingRole({ ready }: { ready: boolean }) {
   );
 }
 
-// ── Magnetic button ───────────────────────────────────────────────────────────
+// ── Hero button ───────────────────────────────────────────────────────────────
 function HeroButton({ href, children, primary }: { href: string; children: React.ReactNode; primary?: boolean }) {
   return (
     <motion.a
       href={href}
       className={primary ? "hero-button hero-button-primary" : "hero-button hero-button-secondary"}
-      whileHover={{ y: -3 }}
-      whileTap={{ y: 0, scale: 0.98 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
+      whileTap={{ scale: 0.96 }}
+      transition={{ duration: 0.16, ease: "easeOut" }}
     >
-      <span>{children}</span>
-      <span className="hero-button-icon" aria-hidden="true">↗</span>
+      <span className="hero-button-fill" aria-hidden="true" />
+      <span className="hero-button-label">{children}</span>
+      <span className="hero-button-arrow" aria-hidden="true">
+        <span>→</span>
+        <span>→</span>
+      </span>
     </motion.a>
   );
 }
@@ -315,11 +318,23 @@ export function HeroScene() {
       </motion.div>
 
       {/* Scroll indicator */}
-      <motion.div initial={{ opacity: 0 }} animate={ready ? { opacity: 1 } : {}} transition={{ delay: 2 }}
-        style={{ position: "absolute", bottom: "2rem", left: "clamp(1.5rem,7vw,7rem)", zIndex: 20 }}>
-        <motion.div animate={{ scaleY: [1, 0.12, 1] }} transition={{ repeat: Infinity, duration: 2.8, ease: "easeInOut" }}
-          style={{ width: 1, height: 48, background: "linear-gradient(to bottom,rgba(201,151,28,0.7),transparent)", transformOrigin: "top" }} />
-      </motion.div>
+      <motion.a
+        href="#about"
+        className="hero-scroll-cue"
+        aria-label="Scroll to the about section"
+        initial={{ opacity: 0, y: 8 }}
+        animate={ready ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 2, duration: 0.6 }}
+      >
+        <motion.span
+          className="hero-scroll-arrow"
+          aria-hidden="true"
+          animate={{ y: [0, 5, 0] }}
+          transition={{ repeat: Infinity, duration: 1.7, ease: "easeInOut" }}
+        >
+          <span />
+        </motion.span>
+      </motion.a>
 
       <style>{`
         .hero-ambient {
@@ -397,52 +412,133 @@ export function HeroScene() {
           position: relative;
           display: inline-flex;
           align-items: center;
-          justify-content: space-between;
-          gap: 1.25rem;
-          min-width: 176px;
-          padding: 0.9rem 1.05rem 0.9rem 1.25rem;
-          border-radius: 4px;
+          justify-content: center;
+          gap: 0.7rem;
+          padding: 0.72rem 0.9rem 0.72rem 1rem;
+          border-radius: 3px;
           font-family: Inter,sans-serif;
-          font-size: 0.86rem;
+          font-size: 0.8rem;
           font-weight: 600;
           text-decoration: none;
           overflow: hidden;
-          transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+          isolation: isolate;
+          transition: color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+        }
+        .hero-button::after {
+          content: "";
+          position: absolute;
+          left: 1rem;
+          right: 2.7rem;
+          bottom: 0.48rem;
+          height: 1px;
+          background: currentColor;
+          opacity: 0.45;
+          transform: scaleX(0);
+          transform-origin: left;
+          transition: transform 0.28s ease;
+        }
+        .hero-button:hover {
+          transform: translateY(-2px);
+        }
+        .hero-button:hover::after {
+          transform: scaleX(1);
+        }
+        .hero-button-fill {
+          position: absolute;
+          inset: 0;
+          z-index: -1;
+          transform: translateX(-102%);
+          transition: transform 0.34s cubic-bezier(0.16,1,0.3,1);
+        }
+        .hero-button:hover .hero-button-fill {
+          transform: translateX(0);
+        }
+        .hero-button-label {
+          position: relative;
+          z-index: 1;
         }
         .hero-button-primary {
           color: #0A0800;
-          background: linear-gradient(135deg, #F0C040, #C9971C);
+          background: #C9971C;
           border: 1px solid #D9A72B;
-          box-shadow: 0 10px 30px rgba(201,151,28,0.2);
+          box-shadow: 0 7px 22px rgba(201,151,28,0.18);
+        }
+        .hero-button-primary .hero-button-fill {
+          background: #F0C040;
         }
         .hero-button-primary:hover {
-          box-shadow: 0 14px 38px rgba(201,151,28,0.34);
+          box-shadow: 0 11px 28px rgba(201,151,28,0.3);
         }
         .hero-button-secondary {
           color: #F5F0E6;
-          background: rgba(201,151,28,0.045);
+          background: rgba(201,151,28,0.035);
           border: 1px solid rgba(201,151,28,0.28);
-          backdrop-filter: blur(10px);
+        }
+        .hero-button-secondary .hero-button-fill {
+          background: rgba(201,151,28,0.13);
         }
         .hero-button-secondary:hover {
           color: #F0C040;
-          background: rgba(201,151,28,0.1);
           border-color: rgba(240,192,64,0.5);
         }
-        .hero-button-icon {
+        .hero-button-arrow {
+          position: relative;
+          width: 17px;
+          height: 16px;
+          overflow: hidden;
+          font-size: 0.95rem;
+          line-height: 16px;
+        }
+        .hero-button-arrow span {
+          position: absolute;
+          inset: 0;
+          transition: transform 0.28s cubic-bezier(0.16,1,0.3,1);
+        }
+        .hero-button-arrow span:last-child {
+          transform: translateX(-130%);
+        }
+        .hero-button:hover .hero-button-arrow span:first-child {
+          transform: translateX(130%);
+        }
+        .hero-button:hover .hero-button-arrow span:last-child {
+          transform: translateX(0);
+        }
+        .hero-scroll-cue {
+          position: absolute;
+          left: calc(50% - 17px);
+          bottom: 1.6rem;
+          z-index: 20;
+          display: inline-flex;
+          align-items: center;
+          color: #9A8758;
+          text-decoration: none;
+          transition: color 0.25s ease;
+        }
+        .hero-scroll-cue:hover {
+          color: #F0C040;
+        }
+        .hero-scroll-arrow {
+          width: 34px;
+          height: 34px;
           display: grid;
-          width: 28px;
-          height: 28px;
           place-items: center;
+          border: 1px solid rgba(201,151,28,0.3);
           border-radius: 50%;
-          background: rgba(10,8,0,0.12);
-          transition: transform 0.25s ease;
+          background: rgba(201,151,28,0.05);
+          box-shadow: 0 0 0 0 rgba(201,151,28,0);
+          transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
         }
-        .hero-button-secondary .hero-button-icon {
-          background: rgba(201,151,28,0.1);
+        .hero-scroll-cue:hover .hero-scroll-arrow {
+          border-color: rgba(240,192,64,0.65);
+          background: rgba(201,151,28,0.12);
+          box-shadow: 0 0 18px rgba(201,151,28,0.15);
         }
-        .hero-button:hover .hero-button-icon {
-          transform: translate(2px,-2px);
+        .hero-scroll-arrow > span {
+          width: 7px;
+          height: 7px;
+          border-right: 1.5px solid currentColor;
+          border-bottom: 1.5px solid currentColor;
+          transform: translateY(-2px) rotate(45deg);
         }
         @keyframes hero-drift {
           from { transform: translate3d(-2%, -2%, 0) scale(0.96); }
@@ -473,8 +569,12 @@ export function HeroScene() {
           }
           .hero-grid h1 { font-size: clamp(3.25rem, 18vw, 5.25rem) !important; }
           .hero-button {
-            width: 100%;
-            min-width: 0;
+            width: auto;
+          }
+          .hero-scroll-cue {
+            left: calc(50% - 17px);
+            right: auto;
+            bottom: 1rem;
           }
         }
         @media(prefers-reduced-motion:reduce){

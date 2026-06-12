@@ -67,7 +67,7 @@ export function ContactScene() {
               {[
                 { dot: "#F0C040", pulse: true,  text: "OPEN TO WORK" },
                 { dot: "rgba(255,255,255,0.12)", pulse: false, text: "AHMEDABAD · INDIA · REMOTE OK" },
-                { dot: "rgba(255,255,255,0.12)", pulse: false, text: "3+ YRS · FULL STACK · MERN + AWS" },
+                { dot: "rgba(255,255,255,0.12)", pulse: false, text: "3+ YRS · FULL STACK DEVELOPER · END-TO-END DELIVERY" },
               ].map((row, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
                   {row.pulse
