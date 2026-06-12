@@ -153,17 +153,17 @@ export function AboutScene() {
     >
       <motion.div
         aria-hidden="true"
-        animate={inView ? { rotate: 360 } : {}}
-        transition={{ duration: 48, repeat: Infinity, ease: "linear" }}
+        animate={inView ? { x: [0, -18, 8, 0], y: [0, 12, -8, 0] } : {}}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
         style={{
           position: "absolute",
           width: "clamp(24rem,44vw,44rem)",
-          aspectRatio: "1",
+          height: "clamp(20rem,38vw,38rem)",
           right: "-16%",
           top: "5%",
-          borderRadius: "50%",
           border: "1px solid rgba(201,151,28,0.05)",
-          background: "radial-gradient(circle, rgba(201,151,28,0.05), transparent 67%)",
+          background: "linear-gradient(135deg, rgba(201,151,28,0.05), transparent 67%)",
+          clipPath: "polygon(18% 0, 100% 12%, 82% 100%, 0 76%)",
           pointerEvents: "none",
         }}
       />
@@ -214,7 +214,7 @@ export function AboutScene() {
             transition={{ duration: 0.7, delay: 0.32, ease: [0.16, 1, 0.3, 1] }}
             style={{ maxWidth: 700, margin: 0, fontFamily: "Inter,sans-serif", fontSize: "clamp(0.95rem,1.5vw,1.08rem)", color: "#9A8758", lineHeight: 1.85 }}
           >
-            I am a full stack developer based in Ahmedabad, working with React, Node.js, TypeScript,
+            I am a full stack developer based in Ahmedabad, working with React, Next.js, Node.js, TypeScript,
             MongoDB, Redis, and AWS. I turn product ideas into fast, secure, and scalable web
             applications, from frontend design and APIs to databases, deployment, and monitoring.
           </motion.p>
@@ -290,25 +290,26 @@ export function AboutScene() {
               aria-hidden="true"
               style={{
                 position: "absolute", inset: 0, overflow: "hidden",
-                background: `radial-gradient(circle at 82% 20%, ${active.accent}12, transparent 34%)`,
+                background: `linear-gradient(135deg, transparent 36%, ${active.accent}12 68%, transparent 68.5%)`,
                 pointerEvents: "none",
               }}
             >
               {[220, 150, 84].map((size, index) => (
                 <motion.span
                   key={size}
-                  animate={{ rotate: index % 2 === 0 ? 360 : -360 }}
-                  transition={{ duration: 24 + index * 8, repeat: Infinity, ease: "linear" }}
+                  animate={{ x: [0, index % 2 === 0 ? 12 : -10, 0], y: [0, -8, 0] }}
+                  transition={{ duration: 7 + index * 2, repeat: Infinity, ease: "easeInOut" }}
                   style={{
-                    position: "absolute", width: size, height: size,
+                    position: "absolute", width: size, height: size * 0.7,
                     right: 28 + index * 35, top: 18 + index * 34,
-                    borderRadius: "50%", border: `1px solid ${active.accent}${index === 0 ? "18" : "10"}`,
+                    border: `1px solid ${active.accent}${index === 0 ? "18" : "10"}`,
+                    clipPath: "polygon(12% 0, 100% 16%, 84% 100%, 0 76%)",
                   }}
                 >
                   <span
                     style={{
                       position: "absolute", width: 6, height: 6,
-                      left: "50%", top: -3, borderRadius: "50%",
+                      left: "50%", top: -3, transform: "rotate(45deg)",
                       background: active.accent, opacity: 0.45,
                       boxShadow: `0 0 12px ${active.accent}`,
                     }}
@@ -329,7 +330,7 @@ export function AboutScene() {
               >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", marginBottom: "1.25rem" }}>
                   <span style={{ fontFamily: "JetBrains Mono,monospace", fontSize: "0.65rem", color: active.accent, letterSpacing: "0.14em" }}>SYSTEM MAP / {active.id}</span>
-                  <motion.span animate={{ opacity: [0.35, 1, 0.35] }} transition={{ duration: 2, repeat: Infinity }} style={{ width: 7, height: 7, borderRadius: "50%", background: active.accent, boxShadow: `0 0 14px ${active.accent}` }} />
+                  <motion.span animate={{ opacity: [0.35, 1, 0.35] }} transition={{ duration: 2, repeat: Infinity }} style={{ width: 7, height: 7, transform: "rotate(45deg)", background: active.accent, boxShadow: `0 0 14px ${active.accent}` }} />
                 </div>
                 <h3 style={{ fontFamily: "Inter,sans-serif", fontSize: "clamp(1.5rem,3vw,2.35rem)", fontWeight: 700, lineHeight: 1.05, letterSpacing: "-0.035em", color: "#F5F0E6", margin: "0 0 1rem" }}>{active.title}</h3>
                 <p style={{ maxWidth: 520, margin: "0 0 2.25rem", fontFamily: "Inter,sans-serif", fontSize: "0.9rem", color: "#9A8758", lineHeight: 1.75 }}>{active.description}</p>
@@ -343,7 +344,7 @@ export function AboutScene() {
                         transition={{ delay: index * 0.08 }}
                         style={{ width: "100%", minHeight: 74, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "0.45rem", padding: "0.65rem 0.4rem", border: `1px solid ${active.accent}35`, borderRadius: 4, background: `${active.accent}0B`, textAlign: "center" }}
                       >
-                        <motion.span animate={{ scale: [1, 1.35, 1] }} transition={{ duration: 2.4, delay: index * 0.25, repeat: Infinity }} style={{ width: 6, height: 6, borderRadius: "50%", background: active.accent }} />
+                        <motion.span animate={{ scale: [1, 1.35, 1], rotate: [45, 135, 45] }} transition={{ duration: 2.4, delay: index * 0.25, repeat: Infinity }} style={{ width: 6, height: 6, background: active.accent }} />
                         <span style={{ fontFamily: "Inter,sans-serif", fontSize: "0.7rem", fontWeight: 600, color: "#F5F0E6", overflowWrap: "anywhere" }}>{node}</span>
                       </motion.div>
                       {index < active.nodes.length - 1 && <motion.span className="system-arrow" animate={{ opacity: [0.25, 1, 0.25], x: [-2, 2, -2] }} transition={{ duration: 1.8, delay: index * 0.2, repeat: Infinity }} style={{ color: active.accent, fontSize: "0.72rem", marginLeft: "0.5rem" }}>→</motion.span>}

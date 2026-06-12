@@ -44,7 +44,7 @@ function StageRow({ stage, index }: { stage: typeof stages[0]; index: number }) 
       {/* Spine node */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 5 }}>
         <motion.div style={{ opacity: op }} whileHover={{ scale: 1.2 }} transition={{ type: "spring", stiffness: 300 }}>
-          <div style={{ width: 48, height: 48, borderRadius: "50%", border: `1.5px solid ${stage.color}45`, background: `${stage.color}0E`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 48, height: 48, clipPath: "polygon(50% 0, 100% 50%, 50% 100%, 0 50%)", border: `1.5px solid ${stage.color}45`, background: `${stage.color}0E`, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: "0.95rem", color: stage.color }}>{stage.glyph}</span>
           </div>
         </motion.div>

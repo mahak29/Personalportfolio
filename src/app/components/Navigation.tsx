@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X } from "lucide-react";
 
@@ -13,6 +13,7 @@ const NAV = [
 export function Navigation() {
   const [scrolled, setScrolled]   = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const scrollFrame = useRef(0);
 
   const scrollToTop = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
@@ -26,9 +27,21 @@ export function Navigation() {
   };
 
   useEffect(() => {
-    const h = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", h, { passive: true });
-    return () => window.removeEventListener("scroll", h);
+    const update = () => {
+      scrollFrame.current = 0;
+      setScrolled(window.scrollY > 60);
+    };
+    const scheduleUpdate = () => {
+      if (scrollFrame.current) return;
+      scrollFrame.current = window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    return () => {
+      if (scrollFrame.current) window.cancelAnimationFrame(scrollFrame.current);
+      window.removeEventListener("scroll", scheduleUpdate);
+    };
   }, []);
 
   return (

@@ -111,11 +111,11 @@ export function ProjectsScene() {
         style={{
           position: "absolute",
           width: "min(52vw,720px)",
-          aspectRatio: "1",
+          height: "min(46vw,620px)",
           right: "-20%",
           top: "8%",
-          borderRadius: "50%",
-          background: `radial-gradient(circle, ${active.accent}12, transparent 68%)`,
+          background: `linear-gradient(135deg, ${active.accent}12, transparent 68%)`,
+          clipPath: "polygon(18% 0, 100% 12%, 82% 100%, 0 74%)",
           transition: "background 0.5s ease",
           pointerEvents: "none",
         }}
@@ -159,7 +159,7 @@ export function ProjectsScene() {
             transition={{ duration: 0.7, delay: 0.2 }}
             style={{ alignSelf: "end", maxWidth: 430, margin: 0, color: "#8E7C52", fontFamily: "Inter,sans-serif", fontSize: "0.95rem", lineHeight: 1.75 }}
           >
-            Selected React and Node.js projects covering SaaS development, CRM automation, live streaming, marketplaces, and SEO-friendly client work.
+            Selected full-stack work using React and Next.js for modern interfaces, with Node.js powering SaaS platforms, automation, real-time systems, and client solutions.
           </motion.p>
         </div>
 

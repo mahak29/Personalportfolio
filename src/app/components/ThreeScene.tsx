@@ -1,21 +1,22 @@
 import { useEffect, useRef } from "react";
+import type { MotionValue } from "motion/react";
 import * as THREE from "three";
 
 type ThreeSceneProps = {
-  scrollProgress?: number;
+  scrollProgress: MotionValue<number>;
   onStatusChange?: (status: "ready" | "unavailable") => void;
 };
 
-export function ThreeScene({ scrollProgress = 0, onStatusChange }: ThreeSceneProps) {
+export function ThreeScene({ scrollProgress, onStatusChange }: ThreeSceneProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const groupRef = useRef<THREE.Group | null>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const rafRef = useRef(0);
   const mouse = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
+
     const shouldDisable = window.matchMedia("(max-width: 900px), (prefers-reduced-motion: reduce)").matches;
     if (shouldDisable) {
       onStatusChange?.("unavailable");
@@ -72,120 +73,171 @@ export function ThreeScene({ scrollProgress = 0, onStatusChange }: ThreeScenePro
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.setClearColor(0x000000, 0);
     mount.appendChild(renderer.domElement);
-    rendererRef.current = renderer;
 
     const group = new THREE.Group();
     scene.add(group);
     groupRef.current = group;
 
-    // Gold icosahedron
-    const icoGeo = new THREE.IcosahedronGeometry(1.4, 1);
-    const icoMat = new THREE.MeshBasicMaterial({ color: 0xC9971C, wireframe: true, transparent: true, opacity: 0.22 });
-    group.add(new THREE.Mesh(icoGeo, icoMat));
+    const frameGeometries: THREE.EdgesGeometry[] = [];
+    const frameMaterials: THREE.LineBasicMaterial[] = [];
+    const frameScales = [
+      [2.7, 1.8, 1.1],
+      [2.05, 2.5, 1.55],
+      [1.35, 1.35, 2.25],
+    ];
+    const frames = frameScales.map(([x, y, z], index) => {
+      const source = new THREE.BoxGeometry(x, y, z);
+      const geometry = new THREE.EdgesGeometry(source);
+      source.dispose();
+      const material = new THREE.LineBasicMaterial({
+        color: index === 1 ? 0xD4834A : 0xC9971C,
+        transparent: true,
+        opacity: 0.13 + index * 0.055,
+      });
+      const frame = new THREE.LineSegments(geometry, material);
+      frame.rotation.set(index * 0.28, index * -0.34, index * 0.18);
+      frameGeometries.push(geometry);
+      frameMaterials.push(material);
+      group.add(frame);
+      return frame;
+    });
 
-    // Inner octahedron — bright gold
-    const octGeo = new THREE.OctahedronGeometry(0.85, 0);
-    const octMesh = new THREE.Mesh(octGeo, new THREE.MeshBasicMaterial({ color: 0xF0C040, wireframe: true, transparent: true, opacity: 0.3 }));
-    group.add(octMesh);
+    const coreGeo = new THREE.TetrahedronGeometry(0.82, 0);
+    const coreMat = new THREE.MeshBasicMaterial({
+      color: 0xF0C040,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.42,
+    });
+    const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+    group.add(coreMesh);
 
-    // Outer sphere shell
-    const sphGeo = new THREE.SphereGeometry(2.1, 20, 14);
-    const sphMat = new THREE.MeshBasicMaterial({ color: 0xC9971C, wireframe: true, transparent: true, opacity: 0.04 });
-    group.add(new THREE.Mesh(sphGeo, sphMat));
+    const axisGeometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(-2.6, 0, 0),
+      new THREE.Vector3(2.6, 0, 0),
+      new THREE.Vector3(0, -2.1, 0),
+      new THREE.Vector3(0, 2.1, 0),
+      new THREE.Vector3(0, 0, -2.1),
+      new THREE.Vector3(0, 0, 2.1),
+    ]);
+    const axisMaterial = new THREE.LineBasicMaterial({
+      color: 0xF0C040,
+      transparent: true,
+      opacity: 0.13,
+    });
+    group.add(new THREE.LineSegments(axisGeometry, axisMaterial));
 
-    // Gold particles
-    const N = 260;
-    const pos = new Float32Array(N * 3);
-    for (let i = 0; i < N; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = 2.3 + Math.random() * 0.9;
-      pos[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
-      pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      pos[i * 3 + 2] = r * Math.cos(phi);
+    const particleCount = 180;
+    const positions = new Float32Array(particleCount * 3);
+    for (let index = 0; index < particleCount; index++) {
+      positions[index * 3] = (Math.random() - 0.5) * 5.4;
+      positions[index * 3 + 1] = (Math.random() - 0.5) * 4.1;
+      positions[index * 3 + 2] = (Math.random() - 0.5) * 3.4;
     }
-    const pgeo = new THREE.BufferGeometry();
-    pgeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    const particles = new THREE.Points(pgeo, new THREE.PointsMaterial({ color: 0xF0C040, size: 0.022, transparent: true, opacity: 0.55 }));
+    const particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    const particleMaterial = new THREE.PointsMaterial({
+      color: 0xF0C040,
+      size: 0.025,
+      transparent: true,
+      opacity: 0.48,
+    });
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
     group.add(particles);
 
-    // Copper ring
-    const ringGeo = new THREE.TorusGeometry(1.9, 0.005, 2, 90);
-    const ringMesh = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xD4834A, transparent: true, opacity: 0.4 }));
-    ringMesh.rotation.x = Math.PI / 2.3;
-    group.add(ringMesh);
-
-    const onMM = (e: MouseEvent) => {
-      mouse.current.x = (e.clientX / window.innerWidth - 0.5) * 2;
-      mouse.current.y = -(e.clientY / window.innerHeight - 0.5) * 2;
+    const onMouseMove = (event: MouseEvent) => {
+      mouse.current.x = (event.clientX / window.innerWidth - 0.5) * 2;
+      mouse.current.y = -(event.clientY / window.innerHeight - 0.5) * 2;
     };
-    window.addEventListener("mousemove", onMM);
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
 
     const onResize = () => {
-      if (!mount) return;
       camera.aspect = mount.clientWidth / mount.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(mount.clientWidth, mount.clientHeight);
     };
     window.addEventListener("resize", onResize);
 
-    let t = 0;
+    let time = 0;
     let visible = !document.hidden;
-    const tgt = { x: 0, y: 0 };
+    let inViewport = true;
+    const target = { x: 0, y: 0 };
 
     const animate = () => {
       rafRef.current = requestAnimationFrame(animate);
-      if (!visible) return;
-      t += 0.004;
-      tgt.x += (mouse.current.y * 0.3 - tgt.x) * 0.04;
-      tgt.y += (mouse.current.x * 0.5 - tgt.y) * 0.04;
-      group.rotation.x = tgt.x + t * 0.07;
-      group.rotation.y = tgt.y + t * 0.11;
-      octMesh.rotation.x = -t * 0.18;
-      octMesh.rotation.z = t * 0.13;
-      const pulse = 1 + Math.sin(t * 1.1) * 0.04;
-      ringMesh.scale.set(pulse, pulse, pulse);
-      particles.rotation.y = t * 0.045;
+      if (!visible || !inViewport) return;
+
+      time += 0.004;
+      target.x += (mouse.current.y * 0.3 - target.x) * 0.04;
+      target.y += (mouse.current.x * 0.5 - target.y) * 0.04;
+      group.rotation.x = target.x * 0.55 + Math.sin(time * 0.35) * 0.04;
+      group.rotation.y = target.y * 0.65 + time * 0.045;
+      coreMesh.rotation.x = -time * 0.22;
+      coreMesh.rotation.y = time * 0.3;
+      frames[0].position.y = Math.sin(time * 0.9) * 0.08;
+      frames[1].position.x = Math.cos(time * 0.7) * 0.1;
+      frames[2].rotation.z = 0.36 + Math.sin(time * 0.55) * 0.12;
+      particles.rotation.y = -time * 0.025;
       renderer.render(scene, camera);
     };
+
     const onContextLost = (event: Event) => {
       event.preventDefault();
       onStatusChange?.("unavailable");
     };
-    const onVisibility = () => { visible = !document.hidden; };
-    document.addEventListener("visibilitychange", onVisibility);
+    const onVisibilityChange = () => {
+      visible = !document.hidden;
+    };
+    const viewportObserver = new IntersectionObserver(
+      ([entry]) => {
+        inViewport = entry.isIntersecting;
+      },
+      { rootMargin: "120px" },
+    );
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
     renderer.domElement.addEventListener("webglcontextlost", onContextLost);
+    viewportObserver.observe(mount);
     renderer.render(scene, camera);
     onStatusChange?.("ready");
     animate();
 
     return () => {
       cancelAnimationFrame(rafRef.current);
-      document.removeEventListener("visibilitychange", onVisibility);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       renderer.domElement.removeEventListener("webglcontextlost", onContextLost);
-      window.removeEventListener("mousemove", onMM);
+      viewportObserver.disconnect();
+      window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("resize", onResize);
       renderer.dispose();
-      icoGeo.dispose();
-      icoMat.dispose();
-      octGeo.dispose();
-      (octMesh.material as THREE.Material).dispose();
-      sphGeo.dispose();
-      sphMat.dispose();
-      pgeo.dispose();
-      particles.material.dispose();
-      ringGeo.dispose();
-      (ringMesh.material as THREE.Material).dispose();
+      frameGeometries.forEach((geometry) => geometry.dispose());
+      frameMaterials.forEach((material) => material.dispose());
+      coreGeo.dispose();
+      coreMat.dispose();
+      axisGeometry.dispose();
+      axisMaterial.dispose();
+      particleGeometry.dispose();
+      particleMaterial.dispose();
       if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
     };
   }, [onStatusChange]);
 
   useEffect(() => {
-    if (!groupRef.current) return;
-    const s = 1 - scrollProgress * 0.28;
-    groupRef.current.scale.setScalar(Math.max(0.6, s));
-    groupRef.current.position.z = -scrollProgress * 1.2;
+    const updateDepth = (progress: number) => {
+      if (!groupRef.current) return;
+      const scale = 1 - progress * 0.28;
+      groupRef.current.scale.setScalar(Math.max(0.6, scale));
+      groupRef.current.position.z = -progress * 1.2;
+    };
+
+    updateDepth(scrollProgress.get());
+    return scrollProgress.on("change", updateDepth);
   }, [scrollProgress]);
 
-  return <div ref={mountRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }} />;
+  return (
+    <div
+      ref={mountRef}
+      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}
+    />
+  );
 }

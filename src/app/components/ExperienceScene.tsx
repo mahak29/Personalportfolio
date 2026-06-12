@@ -135,7 +135,7 @@ function JobCard({ job, index }: { job: typeof jobs[0]; index: number }) {
             </p>
           </div>
           <div style={{
-            width: 36, height: 36, borderRadius: "50%",
+            width: 36, height: 36, clipPath: "polygon(50% 0, 100% 50%, 50% 100%, 0 50%)",
             border: "1px solid rgba(201,151,28,0.12)",
             display: "flex", alignItems: "center", justifyContent: "center",
             color: "#7A6A45", fontSize: "1.1rem", flexShrink: 0,
@@ -173,7 +173,7 @@ function JobCard({ job, index }: { job: typeof jobs[0]; index: number }) {
               <div className="experience-detail-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))", gap: "1.25rem", marginBottom: "2rem" }}>
                 {job.highlights.map((h, hi) => (
                   <div key={hi} style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
-                    <div style={{ width: 5, height: 5, borderRadius: "50%", background: job.accent, flexShrink: 0, marginTop: 6 }} />
+                    <div style={{ width: 5, height: 5, transform: "rotate(45deg)", background: job.accent, flexShrink: 0, marginTop: 6 }} />
                     <div>
                       <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "0.8rem", color: job.accent }}>{h.metric} {h.label}</span>
                       <p style={{ fontFamily: "Inter, sans-serif", fontSize: "0.82rem", color: "#7A6A45", margin: "0.2rem 0 0", lineHeight: 1.65 }}>{h.detail}</p>

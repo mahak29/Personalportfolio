@@ -1,26 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "motion/react";
-import { ThreeScene } from "./ThreeScene";
+
+const ThreeScene = lazy(() =>
+  import("./ThreeScene").then((module) => ({ default: module.ThreeScene })),
+);
 
 // ── Text scramble hook ────────────────────────────────────────────────────────
-const SC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$";
-function useScramble(text: string, active: boolean, delay = 0) {
-  const [display, setDisplay] = useState(() => text.replace(/\S/g, SC[0]));
-  useEffect(() => {
-    if (!active) return;
-    const t0 = setTimeout(() => {
-      let iter = 0;
-      const iv = setInterval(() => {
-        setDisplay(text.split("").map((c, i) => c === " " ? " " : i < Math.floor(iter) ? c : SC[Math.floor(Math.random() * SC.length)]).join(""));
-        iter += 0.5;
-        if (iter > text.length + 2) { clearInterval(iv); setDisplay(text); }
-      }, 28);
-    }, delay);
-    return () => clearTimeout(t0);
-  }, [active, text, delay]);
-  return display;
-}
-
 // ── Char-by-char name ─────────────────────────────────────────────────────────
 function AnimatedName({ ready }: { ready: boolean }) {
   const v = {
@@ -47,7 +32,7 @@ function AnimatedName({ ready }: { ready: boolean }) {
 const ROLES = [
   {
     text: "Full Stack\nDevelopment",
-    sub: "React · Node.js · TypeScript · MongoDB",
+    sub: "React · Next.js · Node.js · TypeScript",
     detail: "Building complete, responsive web applications from user interface to API, database, and deployment.",
   },
   {
@@ -88,6 +73,7 @@ function CyclingRole({ ready }: { ready: boolean }) {
         border: "1px solid rgba(201,151,28,0.12)",
         borderRadius: 8,
         padding: "clamp(2rem,4vw,3rem)",
+        containerType: "inline-size",
       }}
     >
       <div style={{ marginBottom: "1.15rem", fontFamily: "JetBrains Mono,monospace", fontSize: "0.62rem", color: "#C9971C", letterSpacing: "0.14em" }}>
@@ -95,15 +81,36 @@ function CyclingRole({ ready }: { ready: boolean }) {
       </div>
 
       {/* Cycling text */}
-      <div style={{ position: "relative", height: "clamp(6rem,11vw,9rem)", overflow: "hidden", marginBottom: "1rem" }}>
+      <div
+        style={{
+          display: "grid",
+          alignItems: "start",
+          minHeight: "clamp(6.25rem,30cqw,7.4rem)",
+          overflow: "hidden",
+          marginBottom: "1rem",
+        }}
+      >
         <AnimatePresence mode="wait">
           <motion.p
             key={idx}
-            initial={{ y: 36, opacity: 0, filter: "blur(6px)" }}
-            animate={{ y: 0,  opacity: 1, filter: "blur(0px)" }}
-            exit={{   y: -36, opacity: 0, filter: "blur(6px)" }}
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -30, opacity: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            style={{ position: "absolute", inset: 0, fontFamily: "Inter,sans-serif", fontWeight: 800, fontSize: "clamp(1.6rem,3.5vw,3rem)", letterSpacing: "-0.035em", color: "#F5F0E6", margin: 0, lineHeight: 1.1, whiteSpace: "pre-line" }}
+            style={{
+              gridArea: "1 / 1",
+              padding: "0.06em 0 0.28em",
+              boxSizing: "border-box",
+              fontFamily: "Inter,sans-serif",
+              fontWeight: 800,
+              fontSize: "clamp(1.45rem,7.2cqw,2.1rem)",
+              letterSpacing: "-0.035em",
+              color: "#F5F0E6",
+              margin: 0,
+              lineHeight: 1.14,
+              whiteSpace: "pre-line",
+              overflowWrap: "normal",
+            }}
           >
             {ROLES[idx].text}
           </motion.p>
@@ -174,8 +181,8 @@ export function HeroScene() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef  = useRef<HTMLCanvasElement>(null);
   const rafRef     = useRef(0);
+  const pointerRef = useRef({ x: 0.5, y: 0.5 });
   const [ready, setReady] = useState(false);
-  const [sp, setSp]       = useState(0);
   const [threeStatus, setThreeStatus] = useState<"loading" | "ready" | "unavailable">("loading");
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
@@ -189,14 +196,16 @@ export function HeroScene() {
 
   useEffect(() => { const t = setTimeout(() => setReady(true), 80); return () => clearTimeout(t); }, []);
   useEffect(() => {
-    if (threeStatus !== "loading") return;
-    const timeout = window.setTimeout(() => setThreeStatus("unavailable"), 1800);
-    return () => window.clearTimeout(timeout);
-  }, [threeStatus]);
-  useEffect(() => scrollYProgress.on("change", setSp), [scrollYProgress]);
-  useEffect(() => {
-    const mm = (e: MouseEvent) => { mouseX.set(e.clientX / window.innerWidth); mouseY.set(e.clientY / window.innerHeight); };
-    window.addEventListener("mousemove", mm);
+    const mm = (e: MouseEvent) => {
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      pointerRef.current = { x, y };
+      mouseX.set(x);
+      mouseY.set(y);
+      sectionRef.current?.style.setProperty("--hero-pointer-x", `${(x - 0.5) * 18}px`);
+      sectionRef.current?.style.setProperty("--hero-pointer-y", `${(y - 0.5) * 14}px`);
+    };
+    window.addEventListener("mousemove", mm, { passive: true });
     return () => window.removeEventListener("mousemove", mm);
   }, [mouseX, mouseY]);
 
@@ -208,14 +217,18 @@ export function HeroScene() {
       setThreeStatus("unavailable");
       return;
     }
-    let W = 0, H = 0, mx = 0.5, my = 0.5;
+    let W = 0, H = 0;
+    let visible = !document.hidden;
+    let inViewport = true;
     const resize = () => { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; };
     resize();
     window.addEventListener("resize", resize);
-    const mm = (e: MouseEvent) => { mx = e.clientX / window.innerWidth; my = e.clientY / window.innerHeight; };
-    window.addEventListener("mousemove", mm);
     let t = 0;
     const draw = () => {
+      rafRef.current = requestAnimationFrame(draw);
+      if (!visible || !inViewport) return;
+
+      const { x: mx, y: my } = pointerRef.current;
       t += 0.005; ctx.clearRect(0, 0, W, H);
       for (let r = 0; r <= 16; r++) {
         const fy = r / 16, w = Math.sin(t + r * 0.4 + mx * 2.5) * H * 0.01;
@@ -227,13 +240,35 @@ export function HeroScene() {
         ctx.beginPath(); ctx.moveTo(fx * W + w, 0); ctx.lineTo(fx * W - w, H);
         ctx.strokeStyle = `rgba(201,151,28,0.02)`; ctx.lineWidth = 0.4; ctx.stroke();
       }
-      const g = ctx.createRadialGradient(mx * W, my * H, 0, mx * W, my * H, Math.min(W, H) * 0.45);
-      g.addColorStop(0, "rgba(201,151,28,0.08)"); g.addColorStop(1, "transparent");
+      const g = ctx.createLinearGradient(
+        mx * W - W * 0.18,
+        my * H - H * 0.2,
+        mx * W + W * 0.25,
+        my * H + H * 0.24,
+      );
+      g.addColorStop(0, "transparent");
+      g.addColorStop(0.48, "rgba(201,151,28,0.075)");
+      g.addColorStop(1, "transparent");
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-      rafRef.current = requestAnimationFrame(draw);
     };
+    const onVisibilityChange = () => {
+      visible = !document.hidden;
+    };
+    const viewportObserver = new IntersectionObserver(
+      ([entry]) => {
+        inViewport = entry.isIntersecting;
+      },
+      { rootMargin: "120px" },
+    );
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    viewportObserver.observe(canvas);
     draw();
-    return () => { cancelAnimationFrame(rafRef.current); window.removeEventListener("resize", resize); window.removeEventListener("mousemove", mm); };
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      viewportObserver.disconnect();
+      window.removeEventListener("resize", resize);
+    };
   }, []);
 
   return (
@@ -246,33 +281,37 @@ export function HeroScene() {
       <div className="hero-ambient" aria-hidden="true">
         <div className="hero-glow hero-glow-one" />
         <div className="hero-glow hero-glow-two" />
-        <div className="hero-orbit hero-orbit-one" />
-        <div className="hero-orbit hero-orbit-two" />
+        <div className="hero-signal-map">
+          <div className="hero-lattice hero-lattice-back" />
+          <div className="hero-lattice hero-lattice-front" />
+          <div className="hero-beam hero-beam-one" />
+          <div className="hero-beam hero-beam-two" />
+          <i className="hero-node hero-node-one" />
+          <i className="hero-node hero-node-two" />
+          <i className="hero-node hero-node-three" />
+          <div className="hero-signal-core"><span /></div>
+        </div>
         <div className="hero-noise" />
       </div>
 
       {/* Three.js — far right third only, so it doesn't clash with right panel */}
       <div className="three-scene-wrap" style={{ position: "absolute", top: 0, right: 0, width: "35%", height: "100%", zIndex: 2, opacity: 0.5, pointerEvents: "none" }}>
-        <ThreeScene scrollProgress={sp} onStatusChange={setThreeStatus} />
+        <Suspense fallback={null}>
+          <ThreeScene scrollProgress={scrollYProgress} onStatusChange={setThreeStatus} />
+        </Suspense>
         <AnimatePresence>
           {threeStatus === "unavailable" && (
             <motion.div
               className="hero-visual-fallback"
-              initial={{ opacity: 0, scale: 0.94 }}
-              animate={{ opacity: 1, scale: 1 }}
+              aria-hidden="true"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
-              <motion.span
-                animate={{ opacity: [0.35, 1, 0.35] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              >
-                STAY TUNED
-              </motion.span>
-              <motion.i
-                animate={{ scaleX: [0.2, 1, 0.2], opacity: [0.3, 0.9, 0.3] }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-              />
+              <span className="hero-fallback-frame hero-fallback-frame-one" />
+              <span className="hero-fallback-frame hero-fallback-frame-two" />
+              <span className="hero-fallback-core" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -302,7 +341,7 @@ export function HeroScene() {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={ready ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.2, duration: 0.6 }}
               style={{ display: "flex", alignItems: "center", gap: "0.625rem", marginBottom: "2rem" }}>
               <motion.span animate={{ opacity: [1, 0.2, 1] }} transition={{ repeat: Infinity, duration: 2 }}
-                style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "#C9971C", boxShadow: "0 0 10px rgba(201,151,28,0.55)", flexShrink: 0 }} />
+                style={{ display: "inline-block", width: 8, height: 8, transform: "rotate(45deg)", background: "#C9971C", boxShadow: "0 0 10px rgba(201,151,28,0.55)", flexShrink: 0 }} />
               <span style={{ fontFamily: "Inter,sans-serif", fontSize: "0.83rem", color: "#7A6A45" }}>
                 Open to opportunities &nbsp;·&nbsp; Ahmedabad, India
               </span>
@@ -325,8 +364,8 @@ export function HeroScene() {
             {/* Summary */}
             <motion.p initial={{ opacity: 0 }} animate={ready ? { opacity: 1 } : {}} transition={{ delay: 1.25, duration: 0.7 }}
               style={{ fontFamily: "Inter,sans-serif", fontSize: "clamp(0.875rem,1.4vw,1rem)", color: "#7A6A45", lineHeight: 1.8, margin: "0 0 2.5rem", maxWidth: 420 }}>
-              Full stack developer with 3+ years of experience building React and Node.js
-              applications, SaaS products, real-time features, and AWS cloud APIs.
+              Full stack developer with 3+ years of experience building React and Next.js
+              applications, SaaS products, backend services, and cloud integrations.
             </motion.p>
 
             {/* CTAs */}
@@ -377,88 +416,182 @@ export function HeroScene() {
           pointer-events: none;
           background:
             linear-gradient(115deg, rgba(10,8,0,0.18) 10%, transparent 55%),
-            radial-gradient(circle at 72% 45%, rgba(201,151,28,0.12), transparent 34%);
+            linear-gradient(132deg, transparent 45%, rgba(201,151,28,0.08) 72%, transparent 72.2%);
         }
         .hero-glow {
           position: absolute;
-          border-radius: 50%;
-          filter: blur(12px);
+          filter: blur(24px);
           will-change: transform;
+          clip-path: polygon(8% 0, 100% 18%, 82% 100%, 0 74%);
         }
         .hero-glow-one {
           width: min(58vw, 760px);
-          aspect-ratio: 1;
+          height: min(68vw, 820px);
           right: -12%;
           top: -18%;
-          background: radial-gradient(circle, rgba(201,151,28,0.18), rgba(201,151,28,0.045) 42%, transparent 70%);
+          background: linear-gradient(135deg, rgba(201,151,28,0.18), rgba(201,151,28,0.035) 48%, transparent 72%);
           animation: hero-drift 12s ease-in-out infinite alternate;
         }
         .hero-glow-two {
           width: min(38vw, 520px);
-          aspect-ratio: 1;
+          height: min(42vw, 560px);
           left: 34%;
           bottom: -30%;
-          background: radial-gradient(circle, rgba(212,131,74,0.14), transparent 68%);
+          background: linear-gradient(45deg, rgba(212,131,74,0.13), transparent 68%);
           animation: hero-drift 15s ease-in-out -5s infinite alternate-reverse;
         }
-        .hero-orbit {
+        .hero-signal-map {
           position: absolute;
-          right: clamp(-14rem,-8vw,-4rem);
+          width: min(56vw, 760px);
+          height: min(76vw, 780px);
+          right: clamp(-15rem, -8vw, -4rem);
           top: 50%;
-          border: 1px solid rgba(201,151,28,0.16);
-          border-radius: 50%;
-          box-shadow: inset 0 0 60px rgba(201,151,28,0.025), 0 0 45px rgba(201,151,28,0.025);
+          transform: translate3d(var(--hero-pointer-x, 0), calc(-50% + var(--hero-pointer-y, 0)), 0);
+          transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+          opacity: 0.82;
+          will-change: transform;
+          perspective: 900px;
         }
-        .hero-orbit::after {
+        .hero-signal-map::before,
+        .hero-signal-map::after {
           content: "";
           position: absolute;
+          left: 46%;
+          top: 4%;
+          bottom: 4%;
+          width: 1px;
+          background: linear-gradient(transparent, rgba(201,151,28,0.16), transparent);
+          transform: rotate(18deg);
+        }
+        .hero-signal-map::after {
+          left: 2%;
+          right: 2%;
+          top: 50%;
+          bottom: auto;
+          width: auto;
+          height: 1px;
+          transform: rotate(-12deg);
+        }
+        .hero-lattice {
+          position: absolute;
+          inset: 12% 8%;
+          border: 1px solid rgba(201,151,28,0.16);
+          background-image:
+            linear-gradient(rgba(201,151,28,0.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(201,151,28,0.08) 1px, transparent 1px);
+          background-size: 52px 52px;
+          clip-path: polygon(15% 0, 100% 12%, 86% 100%, 0 82%);
+          transform: rotateX(58deg) rotateZ(-18deg);
+          transform-style: preserve-3d;
+          box-shadow: inset 0 0 70px rgba(201,151,28,0.035);
+        }
+        .hero-lattice-back {
+          opacity: 0.38;
+          transform: translate3d(-5%, -3%, -80px) rotateX(58deg) rotateZ(-18deg);
+          animation: hero-lattice-shift 11s ease-in-out infinite alternate;
+        }
+        .hero-lattice-front {
+          inset: 21% 17%;
+          background-size: 34px 34px;
+          border-color: rgba(240,192,64,0.24);
+          animation: hero-lattice-shift 8s ease-in-out -3s infinite alternate-reverse;
+        }
+        .hero-beam {
+          position: absolute;
+          height: 1px;
+          transform-origin: left center;
+          background: linear-gradient(90deg, transparent, rgba(240,192,64,0.8), transparent);
+          box-shadow: 0 0 12px rgba(240,192,64,0.28);
+        }
+        .hero-beam-one {
+          width: 72%;
+          left: 10%;
+          top: 31%;
+          transform: rotate(31deg);
+          animation: hero-beam-pulse 4.8s ease-in-out infinite;
+        }
+        .hero-beam-two {
+          width: 58%;
+          left: 25%;
+          bottom: 28%;
+          transform: rotate(-38deg);
+          animation: hero-beam-pulse 5.6s ease-in-out -2s infinite;
+        }
+        .hero-node {
+          position: absolute;
+          display: block;
           width: 8px;
           height: 8px;
-          left: 11%;
-          top: 15%;
-          border-radius: 50%;
+          transform: rotate(45deg);
           background: #F0C040;
-          box-shadow: 0 0 18px rgba(240,192,64,0.75);
+          box-shadow: 0 0 0 4px rgba(240,192,64,0.07), 0 0 20px rgba(240,192,64,0.72);
+          animation: hero-node-pulse 3s ease-in-out infinite;
         }
-        .hero-orbit-one {
-          width: min(54vw, 740px);
-          aspect-ratio: 1;
-          animation: hero-orbit 24s linear infinite;
+        .hero-node-one { left: 17%; top: 21%; }
+        .hero-node-two { right: 10%; bottom: 24%; width: 5px; height: 5px; animation-delay: -1s; }
+        .hero-node-three { right: 19%; top: 22%; animation-delay: -2s; }
+        .hero-signal-core {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 68px;
+          height: 68px;
+          display: grid;
+          place-items: center;
+          transform: translate(-50%, -50%) rotate(45deg);
+          border: 1px solid rgba(240,192,64,0.34);
+          background: linear-gradient(135deg, rgba(201,151,28,0.08), rgba(10,8,0,0.15));
+          box-shadow: 0 0 42px rgba(201,151,28,0.1);
+          animation: hero-core-pulse 3.6s ease-in-out infinite;
         }
-        .hero-orbit-two {
-          width: min(39vw, 540px);
-          aspect-ratio: 1;
-          right: clamp(-8rem,-3vw,0rem);
-          border-color: rgba(212,131,74,0.14);
-          animation: hero-orbit-reverse 30s linear infinite;
+        .hero-signal-core span {
+          width: 11px;
+          height: 11px;
+          background: #F0C040;
+          box-shadow: 0 0 24px rgba(240,192,64,0.85);
+        }
+        @media(hover:hover) {
+          .hero-signal-map:hover .hero-lattice-front {
+            border-color: rgba(240,192,64,0.4);
+            background-size: 30px 30px;
+          }
         }
         .hero-noise {
           position: absolute;
           inset: 0;
-          opacity: 0.18;
-          background-image: radial-gradient(rgba(245,240,230,0.18) 0.55px, transparent 0.55px);
-          background-size: 5px 5px;
+          opacity: 0.12;
+          background-image: repeating-linear-gradient(115deg, rgba(245,240,230,0.1) 0 1px, transparent 1px 8px);
           mask-image: linear-gradient(to right, transparent 5%, black 70%, transparent);
         }
         .hero-visual-fallback {
           position: absolute;
           inset: 0;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 0.8rem;
-          color: rgba(240,192,64,0.7);
-          font-family: "JetBrains Mono", monospace;
-          font-size: clamp(0.65rem,1vw,0.78rem);
-          letter-spacing: 0.24em;
+          display: grid;
+          place-items: center;
         }
-        .hero-visual-fallback i {
-          display: block;
-          width: 72px;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, #F0C040, transparent);
-          transform-origin: center;
+        .hero-fallback-frame,
+        .hero-fallback-core {
+          position: absolute;
+          border: 1px solid rgba(201,151,28,0.26);
+          clip-path: polygon(14% 0, 100% 10%, 86% 100%, 0 82%);
+        }
+        .hero-fallback-frame-one {
+          inset: 29% 21%;
+          animation: hero-fallback-drift 7s ease-in-out infinite alternate;
+        }
+        .hero-fallback-frame-two {
+          inset: 21% 31%;
+          border-color: rgba(212,131,74,0.32);
+          animation: hero-fallback-drift 9s ease-in-out -3s infinite alternate-reverse;
+        }
+        .hero-fallback-core {
+          left: 50%;
+          top: 50%;
+          width: 42px;
+          height: 42px;
+          border-color: rgba(240,192,64,0.55);
+          background: rgba(240,192,64,0.08);
+          animation: hero-core-pulse 3.6s ease-in-out infinite;
         }
         .hero-button {
           position: relative;
@@ -575,15 +708,16 @@ export function HeroScene() {
           display: grid;
           place-items: center;
           border: 1px solid rgba(201,151,28,0.3);
-          border-radius: 50%;
           background: rgba(201,151,28,0.05);
+          clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
           box-shadow: 0 0 0 0 rgba(201,151,28,0);
-          transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+          transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
         }
         .hero-scroll-cue:hover .hero-scroll-arrow {
           border-color: rgba(240,192,64,0.65);
           background: rgba(201,151,28,0.12);
           box-shadow: 0 0 18px rgba(201,151,28,0.15);
+          transform: rotate(45deg);
         }
         .hero-scroll-arrow > span {
           width: 7px;
@@ -592,26 +726,42 @@ export function HeroScene() {
           border-bottom: 1.5px solid currentColor;
           transform: translateY(-2px) rotate(45deg);
         }
+        .hero-scroll-cue:hover .hero-scroll-arrow > span {
+          transform: translateY(-2px) rotate(0deg);
+        }
         @keyframes hero-drift {
           from { transform: translate3d(-2%, -2%, 0) scale(0.96); }
           to { transform: translate3d(4%, 5%, 0) scale(1.06); }
         }
-        @keyframes hero-orbit {
-          from { transform: translateY(-50%) rotate(-18deg); }
-          to { transform: translateY(-50%) rotate(342deg); }
+        @keyframes hero-lattice-shift {
+          from { transform: translate3d(-3%, -2%, -40px) rotateX(58deg) rotateZ(-18deg); }
+          to { transform: translate3d(3%, 2%, 20px) rotateX(61deg) rotateZ(-14deg); }
         }
-        @keyframes hero-orbit-reverse {
-          from { transform: translateY(-50%) rotate(12deg); }
-          to { transform: translateY(-50%) rotate(-348deg); }
+        @keyframes hero-beam-pulse {
+          0%, 100% { opacity: 0.18; transform-origin: left center; }
+          50% { opacity: 0.9; transform-origin: right center; }
+        }
+        @keyframes hero-node-pulse {
+          0%, 100% { opacity: 0.45; box-shadow: 0 0 0 2px rgba(240,192,64,0.04), 0 0 10px rgba(240,192,64,0.35); }
+          50% { opacity: 1; box-shadow: 0 0 0 6px rgba(240,192,64,0.08), 0 0 24px rgba(240,192,64,0.78); }
+        }
+        @keyframes hero-fallback-drift {
+          from { transform: translate3d(-8px, -6px, 0) rotate(-8deg); }
+          to { transform: translate3d(10px, 8px, 0) rotate(7deg); }
+        }
+        @keyframes hero-core-pulse {
+          0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) rotate(45deg) scale(0.92); }
+          50% { opacity: 1; transform: translate(-50%, -50%) rotate(45deg) scale(1.06); }
         }
         @media(max-width:900px){
           .hero-grid { grid-template-columns: 1fr !important; }
           .hero-grid > div:last-child { display: none !important; }
           #identity { min-height: 100svh !important; height: auto !important; }
           #identity .three-scene-wrap { display: none !important; }
-          .hero-orbit {
-            right: -45%;
-            opacity: 0.7;
+          .hero-signal-map {
+            width: min(110vw, 680px);
+            right: -48%;
+            opacity: 0.5;
           }
         }
         @media(max-width:600px){
@@ -631,8 +781,16 @@ export function HeroScene() {
         }
         @media(prefers-reduced-motion:reduce){
           .hero-glow,
-          .hero-orbit {
+          .hero-lattice,
+          .hero-beam,
+          .hero-node,
+          .hero-fallback-frame,
+          .hero-fallback-core,
+          .hero-signal-core {
             animation: none !important;
+          }
+          .hero-signal-map {
+            transition: none;
           }
         }
       `}</style>

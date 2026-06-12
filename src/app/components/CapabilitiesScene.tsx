@@ -34,7 +34,7 @@ const stacks = [
     code: "UI",
     items: ["React.js", "Next.js", "TypeScript", "JavaScript", "Redux Toolkit", "RTK Query", "TanStack Query", "HTML5 / CSS3", "Flutter & Dart"],
     accent: "#61DAFB",
-    summary: "Building responsive and accessible React interfaces with clean state management and strong performance.",
+    summary: "Building responsive React and Next.js interfaces with accessible design, clean state management, SEO, and strong performance.",
   },
   {
     area: "Backend",
@@ -246,7 +246,7 @@ export function CapabilitiesScene() {
                       <motion.span
                         animate={{ opacity: [0.35, 1, 0.35] }}
                         transition={{ duration: 1.8, repeat: Infinity }}
-                        style={{ width: 7, height: 7, borderRadius: "50%", background: active.accent, boxShadow: `0 0 12px ${active.accent}` }}
+                        style={{ width: 7, height: 7, transform: "rotate(45deg)", background: active.accent, boxShadow: `0 0 12px ${active.accent}` }}
                       />
                       <span style={{ fontFamily: "JetBrains Mono,monospace", fontSize: "0.62rem", color: active.accent, letterSpacing: "0.14em" }}>SIGNAL ACTIVE</span>
                     </div>

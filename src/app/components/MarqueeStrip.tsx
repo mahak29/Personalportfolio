@@ -1,9 +1,9 @@
 import { motion } from "motion/react";
 
 const items = [
-  "React.js", "·", "Node.js", "·", "TypeScript", "·", "MongoDB", "·",
+  "React.js", "·", "Next.js", "·", "Node.js", "·", "TypeScript", "·", "MongoDB", "·",
   "Redis Pub/Sub", "·", "AWS Lambda", "·", "WhatsApp API", "·", "Agora SDK", "·",
-  "BullMQ", "·", "Next.js", "·", "Razorpay", "·", "Firebase", "·",
+  "BullMQ", "·", "Razorpay", "·", "Firebase", "·",
   "Stripe", "·", "RTK Query", "·", "WebSockets", "·", "TanStack Query", "·",
 ];
 

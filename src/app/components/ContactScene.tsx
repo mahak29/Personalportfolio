@@ -34,7 +34,7 @@ export function ContactScene() {
       style={{ background: "#0A0800", minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
 
       {/* Ambient */}
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 65% 55% at 15% 75%, rgba(201,151,28,0.07) 0%, transparent 65%)" }} />
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "linear-gradient(32deg, rgba(201,151,28,0.07) 0%, transparent 42%)" }} />
       {/* Ghost "HI." */}
       <div style={{ position: "absolute", bottom: "-4%", left: "-2%", fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "clamp(7rem,24vw,28rem)", color: "#C9971C", opacity: 0.025, lineHeight: 1, letterSpacing: "-0.07em", userSelect: "none", pointerEvents: "none" }}>HI.</div>
 
@@ -71,8 +71,8 @@ export function ContactScene() {
               ].map((row, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
                   {row.pulse
-                    ? <motion.div animate={{ scale: [1, 1.5, 1], opacity: [1, 0.4, 1] }} transition={{ repeat: Infinity, duration: 2 }} style={{ width: 7, height: 7, borderRadius: "50%", background: row.dot, flexShrink: 0 }} />
-                    : <div style={{ width: 7, height: 7, borderRadius: "50%", background: row.dot, flexShrink: 0 }} />
+                    ? <motion.div animate={{ scale: [1, 1.5, 1], opacity: [1, 0.4, 1], rotate: [45, 135, 45] }} transition={{ repeat: Infinity, duration: 2 }} style={{ width: 7, height: 7, background: row.dot, flexShrink: 0 }} />
+                    : <div style={{ width: 7, height: 7, transform: "rotate(45deg)", background: row.dot, flexShrink: 0 }} />
                   }
                   <span style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", color: "#7A6A45", letterSpacing: "0.1em" }}>{row.text}</span>
                 </div>
@@ -99,7 +99,7 @@ export function ContactScene() {
                       <div style={{ fontFamily: "Inter, sans-serif", fontSize: "clamp(0.85rem,1.8vw,1.05rem)", color: "#F5F0E6", fontWeight: 500, overflowWrap: "anywhere" }}>{c.value}</div>
                     </div>
                     {!c.copy && (
-                      <span style={{ width: 38, height: 38, borderRadius: "50%", border: `1px solid ${c.accent}35`, background: `${c.accent}10`, display: "flex", alignItems: "center", justifyContent: "center", color: c.accent, flexShrink: 0 }}>
+                      <span style={{ width: 38, height: 38, clipPath: "polygon(50% 0, 100% 50%, 50% 100%, 0 50%)", border: `1px solid ${c.accent}35`, background: `${c.accent}10`, display: "flex", alignItems: "center", justifyContent: "center", color: c.accent, flexShrink: 0 }}>
                         <ExternalLink size={16} strokeWidth={1.8} aria-hidden="true" />
                       </span>
                     )}
@@ -112,7 +112,7 @@ export function ContactScene() {
                       aria-label={`Copy ${c.label.toLowerCase()}`}
                       title={copied === c.label ? "Copied" : `Copy ${c.label.toLowerCase()}`}
                       style={{
-                        width: 38, height: 38, borderRadius: "50%", padding: 0,
+                        width: 38, height: 38, clipPath: "polygon(50% 0, 100% 50%, 50% 100%, 0 50%)", padding: 0,
                         border: `1px solid ${copied === c.label ? c.accent : "rgba(201,151,28,0.22)"}`,
                         background: copied === c.label ? `${c.accent}18` : "rgba(201,151,28,0.04)",
                         display: "flex", alignItems: "center", justifyContent: "center",

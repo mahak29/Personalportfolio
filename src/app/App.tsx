@@ -9,6 +9,15 @@ import { MarqueeStrip } from "./components/MarqueeStrip";
 import { Navigation } from "./components/Navigation";
 import { ProjectsScene } from "./components/ProjectsScene";
 
+const SECTIONS = [
+  { id: "identity", accent: "#F0C040", gentle: true, content: <><HeroScene /><MarqueeStrip /></> },
+  { id: "about", accent: "#C9971C", content: <AboutScene /> },
+  { id: "projects", accent: "#D4834A", gentle: true, content: <ProjectsScene /> },
+  { id: "experience", accent: "#F0C040", content: <ExperienceScene /> },
+  { id: "capabilities", accent: "#C9971C", content: <CapabilitiesScene /> },
+  { id: "contact", accent: "#D4834A", gentle: true, content: <ContactScene /> },
+] as const;
+
 export default function App() {
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -82,21 +91,20 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const sectionIds = ["identity", "about", "projects", "experience", "capabilities", "contact"];
+    const sections = SECTIONS.map(({ id }) => document.getElementById(id)).filter(
+      (section): section is HTMLElement => Boolean(section),
+    );
     let frame = 0;
     let activeId = "";
 
     const updateHash = () => {
       frame = 0;
       const marker = Math.min(window.innerHeight * 0.38, 320);
-      let nextId = sectionIds[0];
+      let nextId = SECTIONS[0].id;
 
-      for (const id of sectionIds) {
-        const section = document.getElementById(id);
-        if (!section) continue;
-
+      for (const section of sections) {
         const rect = section.getBoundingClientRect();
-        if (rect.top <= marker && rect.bottom > marker) nextId = id;
+        if (rect.top <= marker && rect.bottom > marker) nextId = section.id;
       }
 
       const nextHash = nextId === "identity" ? "" : `#${nextId}`;
@@ -128,25 +136,16 @@ export default function App() {
       <Navigation />
 
       <main className="depth-stage">
-        <DepthSection index={1} accent="#F0C040" gentle>
-          <HeroScene />
-          <MarqueeStrip />
-        </DepthSection>
-        <DepthSection index={2} accent="#C9971C">
-          <AboutScene />
-        </DepthSection>
-        <DepthSection index={3} accent="#D4834A" gentle>
-          <ProjectsScene />
-        </DepthSection>
-        <DepthSection index={4} accent="#F0C040">
-          <ExperienceScene />
-        </DepthSection>
-        <DepthSection index={5} accent="#C9971C">
-          <CapabilitiesScene />
-        </DepthSection>
-        <DepthSection index={6} accent="#D4834A" gentle>
-          <ContactScene />
-        </DepthSection>
+        {SECTIONS.map((section, index) => (
+          <DepthSection
+            key={section.id}
+            index={index + 1}
+            accent={section.accent}
+            gentle={"gentle" in section && section.gentle}
+          >
+            {section.content}
+          </DepthSection>
+        ))}
       </main>
     </div>
   );
