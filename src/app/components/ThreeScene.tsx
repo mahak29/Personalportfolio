@@ -18,7 +18,43 @@ export function ThreeScene({ scrollProgress = 0 }: { scrollProgress?: number }) 
     const camera = new THREE.PerspectiveCamera(48, mount.clientWidth / mount.clientHeight, 0.1, 100);
     camera.position.set(0, 0, 5.5);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const canvas = document.createElement("canvas");
+    const preferredAttributes: WebGLContextAttributes = {
+      alpha: true,
+      antialias: true,
+      depth: true,
+      powerPreference: "default",
+    };
+
+    let context: WebGL2RenderingContext | null = null;
+    try {
+      context = canvas.getContext("webgl2", preferredAttributes);
+      if (!context) {
+        context = canvas.getContext("webgl2", {
+          alpha: true,
+          antialias: false,
+          depth: true,
+          powerPreference: "low-power",
+        });
+      }
+    } catch {
+      return;
+    }
+
+    if (!context) return;
+
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        context,
+        antialias: context.getContextAttributes()?.antialias ?? false,
+        alpha: true,
+      });
+    } catch {
+      return;
+    }
+
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.setClearColor(0x000000, 0);

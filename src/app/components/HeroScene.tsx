@@ -121,24 +121,17 @@ function CyclingRole({ ready }: { ready: boolean }) {
 }
 
 // ── Magnetic button ───────────────────────────────────────────────────────────
-function MagBtn({ href, children, primary }: { href: string; children: React.ReactNode; primary?: boolean }) {
-  const ref = useRef<HTMLAnchorElement>(null);
-  const x = useMotionValue(0), y = useMotionValue(0);
-  const sx = useSpring(x, { stiffness: 200, damping: 18 });
-  const sy = useSpring(y, { stiffness: 200, damping: 18 });
-  const onMove = (e: React.MouseEvent) => {
-    const r = ref.current!.getBoundingClientRect();
-    x.set((e.clientX - r.left - r.width  / 2) * 0.35);
-    y.set((e.clientY - r.top  - r.height / 2) * 0.35);
-  };
-  const onLeave = () => { x.set(0); y.set(0); };
+function HeroButton({ href, children, primary }: { href: string; children: React.ReactNode; primary?: boolean }) {
   return (
-    <motion.a ref={ref} href={href}
-      style={{ x: sx, y: sy, display: "inline-flex", alignItems: "center", gap: "0.4rem", fontFamily: "Inter,sans-serif", fontWeight: primary ? 600 : 500, fontSize: "0.9rem", color: primary ? "#0A0800" : "#F5F0E6", background: primary ? "#C9971C" : "transparent", border: primary ? "none" : "1px solid rgba(201,151,28,0.3)", padding: "0.8rem 1.75rem", borderRadius: "3px", textDecoration: "none", cursor: "none" }}
-      onMouseMove={onMove} onMouseLeave={onLeave}
-      whileHover={{ scale: 1.04, background: primary ? "#F0C040" : "rgba(201,151,28,0.08)", boxShadow: primary ? "0 8px 28px rgba(201,151,28,0.35)" : "none" }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}>
-      {children}
+    <motion.a
+      href={href}
+      className={primary ? "hero-button hero-button-primary" : "hero-button hero-button-secondary"}
+      whileHover={{ y: -3 }}
+      whileTap={{ y: 0, scale: 0.98 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+    >
+      <span>{children}</span>
+      <span className="hero-button-icon" aria-hidden="true">↗</span>
     </motion.a>
   );
 }
@@ -235,6 +228,14 @@ export function HeroScene() {
       {/* Canvas grid — full bg */}
       <canvas ref={canvasRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 1 }} />
 
+      <div className="hero-ambient" aria-hidden="true">
+        <div className="hero-glow hero-glow-one" />
+        <div className="hero-glow hero-glow-two" />
+        <div className="hero-orbit hero-orbit-one" />
+        <div className="hero-orbit hero-orbit-two" />
+        <div className="hero-noise" />
+      </div>
+
       {/* Three.js — far right third only, so it doesn't clash with right panel */}
       <div className="three-scene-wrap" style={{ position: "absolute", top: 0, right: 0, width: "35%", height: "100%", zIndex: 2, opacity: 0.5, pointerEvents: "none" }}>
         {showThree && (
@@ -298,11 +299,10 @@ export function HeroScene() {
             {/* CTAs */}
             <motion.div initial={{ opacity: 0, y: 12 }} animate={ready ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.65, duration: 0.55 }}
               style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap" }}>
-              <MagBtn href="#projects" primary>
-                View Work
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              </MagBtn>
-              <MagBtn href="#contact">Say Hello</MagBtn>
+              <HeroButton href="#projects" primary>
+                Explore Projects
+              </HeroButton>
+              <HeroButton href="#contact">Start a Conversation</HeroButton>
             </motion.div>
           </div>
 
@@ -324,11 +324,149 @@ export function HeroScene() {
       </motion.div>
 
       <style>{`
+        .hero-ambient {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          overflow: hidden;
+          pointer-events: none;
+          background:
+            linear-gradient(115deg, rgba(10,8,0,0.18) 10%, transparent 55%),
+            radial-gradient(circle at 72% 45%, rgba(201,151,28,0.12), transparent 34%);
+        }
+        .hero-glow {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(12px);
+          will-change: transform;
+        }
+        .hero-glow-one {
+          width: min(58vw, 760px);
+          aspect-ratio: 1;
+          right: -12%;
+          top: -18%;
+          background: radial-gradient(circle, rgba(201,151,28,0.18), rgba(201,151,28,0.045) 42%, transparent 70%);
+          animation: hero-drift 12s ease-in-out infinite alternate;
+        }
+        .hero-glow-two {
+          width: min(38vw, 520px);
+          aspect-ratio: 1;
+          left: 34%;
+          bottom: -30%;
+          background: radial-gradient(circle, rgba(212,131,74,0.14), transparent 68%);
+          animation: hero-drift 15s ease-in-out -5s infinite alternate-reverse;
+        }
+        .hero-orbit {
+          position: absolute;
+          right: clamp(-14rem,-8vw,-4rem);
+          top: 50%;
+          border: 1px solid rgba(201,151,28,0.16);
+          border-radius: 50%;
+          box-shadow: inset 0 0 60px rgba(201,151,28,0.025), 0 0 45px rgba(201,151,28,0.025);
+        }
+        .hero-orbit::after {
+          content: "";
+          position: absolute;
+          width: 8px;
+          height: 8px;
+          left: 11%;
+          top: 15%;
+          border-radius: 50%;
+          background: #F0C040;
+          box-shadow: 0 0 18px rgba(240,192,64,0.75);
+        }
+        .hero-orbit-one {
+          width: min(54vw, 740px);
+          aspect-ratio: 1;
+          animation: hero-orbit 24s linear infinite;
+        }
+        .hero-orbit-two {
+          width: min(39vw, 540px);
+          aspect-ratio: 1;
+          right: clamp(-8rem,-3vw,0rem);
+          border-color: rgba(212,131,74,0.14);
+          animation: hero-orbit-reverse 30s linear infinite;
+        }
+        .hero-noise {
+          position: absolute;
+          inset: 0;
+          opacity: 0.18;
+          background-image: radial-gradient(rgba(245,240,230,0.18) 0.55px, transparent 0.55px);
+          background-size: 5px 5px;
+          mask-image: linear-gradient(to right, transparent 5%, black 70%, transparent);
+        }
+        .hero-button {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1.25rem;
+          min-width: 176px;
+          padding: 0.9rem 1.05rem 0.9rem 1.25rem;
+          border-radius: 4px;
+          font-family: Inter,sans-serif;
+          font-size: 0.86rem;
+          font-weight: 600;
+          text-decoration: none;
+          overflow: hidden;
+          transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        .hero-button-primary {
+          color: #0A0800;
+          background: linear-gradient(135deg, #F0C040, #C9971C);
+          border: 1px solid #D9A72B;
+          box-shadow: 0 10px 30px rgba(201,151,28,0.2);
+        }
+        .hero-button-primary:hover {
+          box-shadow: 0 14px 38px rgba(201,151,28,0.34);
+        }
+        .hero-button-secondary {
+          color: #F5F0E6;
+          background: rgba(201,151,28,0.045);
+          border: 1px solid rgba(201,151,28,0.28);
+          backdrop-filter: blur(10px);
+        }
+        .hero-button-secondary:hover {
+          color: #F0C040;
+          background: rgba(201,151,28,0.1);
+          border-color: rgba(240,192,64,0.5);
+        }
+        .hero-button-icon {
+          display: grid;
+          width: 28px;
+          height: 28px;
+          place-items: center;
+          border-radius: 50%;
+          background: rgba(10,8,0,0.12);
+          transition: transform 0.25s ease;
+        }
+        .hero-button-secondary .hero-button-icon {
+          background: rgba(201,151,28,0.1);
+        }
+        .hero-button:hover .hero-button-icon {
+          transform: translate(2px,-2px);
+        }
+        @keyframes hero-drift {
+          from { transform: translate3d(-2%, -2%, 0) scale(0.96); }
+          to { transform: translate3d(4%, 5%, 0) scale(1.06); }
+        }
+        @keyframes hero-orbit {
+          from { transform: translateY(-50%) rotate(-18deg); }
+          to { transform: translateY(-50%) rotate(342deg); }
+        }
+        @keyframes hero-orbit-reverse {
+          from { transform: translateY(-50%) rotate(12deg); }
+          to { transform: translateY(-50%) rotate(-348deg); }
+        }
         @media(max-width:900px){
           .hero-grid { grid-template-columns: 1fr !important; }
           .hero-grid > div:last-child { display: none !important; }
           #identity { min-height: 100svh !important; height: auto !important; }
           #identity .three-scene-wrap { display: none !important; }
+          .hero-orbit {
+            right: -45%;
+            opacity: 0.7;
+          }
         }
         @media(max-width:600px){
           .hero-grid {
@@ -336,6 +474,16 @@ export function HeroScene() {
             gap: 1.5rem !important;
           }
           .hero-grid h1 { font-size: clamp(3.25rem, 18vw, 5.25rem) !important; }
+          .hero-button {
+            width: 100%;
+            min-width: 0;
+          }
+        }
+        @media(prefers-reduced-motion:reduce){
+          .hero-glow,
+          .hero-orbit {
+            animation: none !important;
+          }
         }
       `}</style>
     </section>
