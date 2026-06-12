@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { AboutScene } from "./components/AboutScene";
 import { CapabilitiesScene } from "./components/CapabilitiesScene";
 import { ContactScene } from "./components/ContactScene";
-import { CustomCursor } from "./components/CustomCursor";
 import { DepthSection } from "./components/DepthSection";
 import { ExperienceScene } from "./components/ExperienceScene";
 import { HeroScene } from "./components/HeroScene";
@@ -47,9 +46,6 @@ export default function App() {
         isolation: isolate;
         backface-visibility: hidden;
       }
-      @media (hover: hover) and (pointer: fine) {
-        body, a, button, [data-cursor] { cursor: none !important; }
-      }
       @media (max-width: 768px) {
         .about-grid,
         .cap-grid,
@@ -85,9 +81,49 @@ export default function App() {
     return () => document.head.removeChild(style);
   }, []);
 
+  useEffect(() => {
+    const sectionIds = ["identity", "about", "projects", "experience", "capabilities", "contact"];
+    let frame = 0;
+    let activeId = "";
+
+    const updateHash = () => {
+      frame = 0;
+      const marker = Math.min(window.innerHeight * 0.38, 320);
+      let nextId = sectionIds[0];
+
+      for (const id of sectionIds) {
+        const section = document.getElementById(id);
+        if (!section) continue;
+
+        const rect = section.getBoundingClientRect();
+        if (rect.top <= marker && rect.bottom > marker) nextId = id;
+      }
+
+      if (nextId === activeId && window.location.hash === `#${nextId}`) return;
+
+      activeId = nextId;
+      const url = `${window.location.pathname}${window.location.search}#${nextId}`;
+      window.history.replaceState(window.history.state, "", url);
+    };
+
+    const scheduleUpdate = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(updateHash);
+    };
+
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    scheduleUpdate();
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+    };
+  }, []);
+
   return (
     <div style={{ background: "#0A0800", minHeight: "100vh", color: "#F5F0E6", overflowX: "clip" }}>
-      <CustomCursor />
       <Navigation />
 
       <main className="depth-stage">

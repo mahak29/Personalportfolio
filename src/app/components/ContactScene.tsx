@@ -53,16 +53,15 @@ export function ContactScene() {
           initial={{ y: 28 }}
           animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
           transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          style={{ fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "clamp(2.75rem,7vw,6.5rem)", lineHeight: 0.96, letterSpacing: "-0.045em", color: "#F5F0E6", margin: "0 0 clamp(2.5rem,5vw,4rem)", transformOrigin: "left center" }}>
-          Need a full-stack<br />developer for your<br /><span style={{ color: "#C9971C" }}>next product?</span>
+          style={{ fontFamily: "Inter, sans-serif", fontWeight: 800, fontSize: "clamp(2.25rem,5.5vw,5rem)", lineHeight: 0.98, letterSpacing: "-0.045em", color: "#F5F0E6", margin: "0 0 clamp(2.5rem,5vw,4rem)", transformOrigin: "left center" }}>
+          Let's work<br />on something<br /><span style={{ color: "#C9971C" }}>worth building.</span>
         </motion.h2>
 
         <div className="contact-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(2rem,6vw,6rem)", alignItems: "start" }}>
           {/* Left */}
           <motion.div initial={{ opacity: 0, y: 24 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.8, delay: 0.2 }}>
             <p style={{ fontFamily: "Inter, sans-serif", fontSize: "1rem", color: "#7A6A45", lineHeight: 1.85, margin: "0 0 2.5rem", maxWidth: 380 }}>
-              I am open to full-time roles, freelance projects, and product collaborations.
-              Contact me for React, Node.js, SaaS, API integration, real-time features, or AWS development.
+           Open to freelance projects, product collaborations, and full-time opportunities. Let’s connect to discuss how I can support your next idea or product.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               {[
@@ -93,7 +92,7 @@ export function ContactScene() {
                     target={c.label === "LinkedIn" ? "_blank" : undefined}
                     rel={c.label === "LinkedIn" ? "noopener noreferrer" : undefined}
                     aria-label={`${c.label}: ${c.value}`}
-                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flex: 1, minWidth: 0, padding: "1.5rem 0", textDecoration: "none", cursor: "none" }}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flex: 1, minWidth: 0, padding: "1.5rem 0", textDecoration: "none", cursor: "pointer" }}
                   >
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontFamily: "Inter, sans-serif", fontSize: "0.72rem", fontWeight: 500, color: "#7A6A45", letterSpacing: "0.1em", marginBottom: "0.3rem" }}>{c.label.toUpperCase()}</div>
@@ -118,7 +117,7 @@ export function ContactScene() {
                         background: copied === c.label ? `${c.accent}18` : "rgba(201,151,28,0.04)",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         color: copied === c.label ? c.accent : "#7A6A45",
-                        flexShrink: 0, transition: "all 0.3s", cursor: "none",
+                        flexShrink: 0, transition: "all 0.3s", cursor: "pointer",
                       }}
                     >
                       {copied === c.label
